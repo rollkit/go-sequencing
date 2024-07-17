@@ -1,0 +1,47 @@
+syntax = "proto3";
+package rollkit;
+
+// SequencerInput ...
+service SequencerInput {
+    // SubmitRollupTransaction ...
+    rpc SubmitRollupTransaction(SubmitRollupTransactionRequest) returns (SubmitRollupTransactionResponse) {}
+}
+
+// SubmitRollupTransactionRequest ...
+message SubmitRollupTransactionRequest {
+    // the unhashed rollup id
+	bytes rollup_id = 1;
+	// the raw data bytes of the rollup transaction
+	bytes data = 2;
+}
+
+// SubmitRollupTransactionResponse ...
+message SubmitRollupTransactionResponse {
+}
+
+// SequencerOutput ...
+service SequencerOutput {
+    // SubmitRollupTransaction ...
+    rpc GetNextBatch(BatchRequest) returns (BatchResponse) {}
+}
+
+// BatchRequest provides the last batch while requesting for the next batch
+message BatchRequest {
+    repeated bytes transactions = 1;
+}
+
+// BatchResponse contains the transaction batch that is last sequenced
+message BatchResponse {
+    repeated bytes transactions = 1;
+}
+
+// BatchVerifier
+service BatchVerifier {
+    // VerifyBatch ...
+    rpc VerifyBatch(BatchRequest) returns VerificationResponse {}
+}
+
+// VerificationResponse
+message VerificationResponse {
+    bool success = 1;
+}
