@@ -38,7 +38,7 @@ message BatchResponse {
 // BatchVerifier
 service BatchVerifier {
     // VerifyBatch ...
-    rpc VerifyBatch(BatchRequest) returns VerificationResponse {}
+    rpc VerifyBatch(BatchRequest) returns (VerificationResponse) {}
 }
 
 // VerificationResponse
