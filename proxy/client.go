@@ -11,6 +11,7 @@ import (
 	proxygrpc "github.com/rollkit/go-sequencing/proxy/grpc"
 )
 
+// NewClient creates a new Sequencer client.
 func NewClient(uri string) (sequencing.Sequencer, error) {
 	addr, err := url.Parse(uri)
 	if err != nil {

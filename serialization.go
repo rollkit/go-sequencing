@@ -4,10 +4,12 @@ import (
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 )
 
+// ToProto serializes a batch to a protobuf message.
 func (batch *Batch) ToProto() *pbseq.Batch {
 	return &pbseq.Batch{Transactions: txsToByteSlices(batch.Transactions)}
 }
 
+// FromProto deserializes a batch from a protobuf message.
 func (batch *Batch) FromProto(pb *pbseq.Batch) {
 	batch.Transactions = byteSlicesToTxs(pb.Transactions)
 }
@@ -30,11 +32,13 @@ func byteSlicesToTxs(bytes [][]byte) []Tx {
 	return txs
 }
 
+// Marshal serializes a batch to a byte slice.
 func (batch *Batch) Marshal() ([]byte, error) {
 	pb := batch.ToProto()
 	return pb.Marshal()
 }
 
+// Unmarshal deserializes a batch from a byte slice.
 func (batch *Batch) Unmarshal(data []byte) error {
 	var pb pbseq.Batch
 	if err := pb.Unmarshal(data); err != nil {

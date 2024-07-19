@@ -3,9 +3,10 @@ package grpc
 import (
 	"context"
 
+	"google.golang.org/grpc"
+
 	"github.com/rollkit/go-sequencing"
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
-	"google.golang.org/grpc"
 )
 
 // Client is a gRPC proxy client for DA interface.

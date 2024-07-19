@@ -10,8 +10,10 @@ import (
 	"github.com/rollkit/go-sequencing"
 )
 
+// ErrorRollupIdMismatch is returned when the rollup id does not match
 var ErrorRollupIdMismatch = errors.New("rollup id mismatch")
 
+// TransactionQueue is a queue of transactions
 type TransactionQueue struct {
 	queue []sequencing.Tx
 	mu    sync.Mutex
@@ -31,7 +33,7 @@ func (tq *TransactionQueue) AddTransaction(tx sequencing.Tx) {
 	tq.queue = append(tq.queue, tx)
 }
 
-// GetBatch extracts a batch of transactions from the queue
+// GetNextBatch extracts a batch of transactions from the queue
 func (tq *TransactionQueue) GetNextBatch() sequencing.Batch {
 	tq.mu.Lock()
 	defer tq.mu.Unlock()
@@ -89,6 +91,7 @@ func (d *DummySequencer) VerifyBatch(ctx context.Context, batch sequencing.Batch
 	return ok, nil
 }
 
+// NewDummySequencer creates a new DummySequencer
 func NewDummySequencer() *DummySequencer {
 	return &DummySequencer{
 		tq: NewTransactionQueue(),
