@@ -48,16 +48,20 @@ func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.
 	return &pbseq.SubmitRollupTransactionResponse{}, nil
 }
 
-func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.BatchRequest) (*pbseq.BatchResponse, error) {
-	batch, err := s.SequencerOutput.GetNextBatch(ctx, req.Transactions)
+func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.Batch, error) {
+	lastBatch := sequencing.Batch{}
+	lastBatch.FromProto(req)
+	batch, err := s.SequencerOutput.GetNextBatch(ctx, lastBatch)
 	if err != nil {
 		return nil, err
 	}
-	return &pbseq.BatchResponse{Transactions: batch}, nil
+	return batch.ToProto(), nil
 }
 
-func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.BatchRequest) (*pbseq.VerificationResponse, error) {
-	ok, err := s.BatchVerifier.VerifyBatch(ctx, req.Transactions)
+func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.VerificationResponse, error) {
+	batch := sequencing.Batch{}
+	batch.FromProto(req)
+	ok, err := s.BatchVerifier.VerifyBatch(ctx, batch)
 	if err != nil {
 		return nil, err
 	}

@@ -118,23 +118,23 @@ func (m *SubmitRollupTransactionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SubmitRollupTransactionResponse proto.InternalMessageInfo
 
-// BatchRequest provides the last batch while requesting for the next batch
-type BatchRequest struct {
+// Batch holds a list of transactions
+type Batch struct {
 	Transactions [][]byte `protobuf:"bytes,1,rep,name=transactions,proto3" json:"transactions,omitempty"`
 }
 
-func (m *BatchRequest) Reset()         { *m = BatchRequest{} }
-func (m *BatchRequest) String() string { return proto.CompactTextString(m) }
-func (*BatchRequest) ProtoMessage()    {}
-func (*BatchRequest) Descriptor() ([]byte, []int) {
+func (m *Batch) Reset()         { *m = Batch{} }
+func (m *Batch) String() string { return proto.CompactTextString(m) }
+func (*Batch) ProtoMessage()    {}
+func (*Batch) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b389fdbc59f03c95, []int{2}
 }
-func (m *BatchRequest) XXX_Unmarshal(b []byte) error {
+func (m *Batch) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *BatchRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Batch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_BatchRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Batch.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -144,64 +144,19 @@ func (m *BatchRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *BatchRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BatchRequest.Merge(m, src)
+func (m *Batch) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Batch.Merge(m, src)
 }
-func (m *BatchRequest) XXX_Size() int {
+func (m *Batch) XXX_Size() int {
 	return m.Size()
 }
-func (m *BatchRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_BatchRequest.DiscardUnknown(m)
+func (m *Batch) XXX_DiscardUnknown() {
+	xxx_messageInfo_Batch.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_BatchRequest proto.InternalMessageInfo
+var xxx_messageInfo_Batch proto.InternalMessageInfo
 
-func (m *BatchRequest) GetTransactions() [][]byte {
-	if m != nil {
-		return m.Transactions
-	}
-	return nil
-}
-
-// BatchResponse contains the transaction batch that is last sequenced
-type BatchResponse struct {
-	Transactions [][]byte `protobuf:"bytes,1,rep,name=transactions,proto3" json:"transactions,omitempty"`
-}
-
-func (m *BatchResponse) Reset()         { *m = BatchResponse{} }
-func (m *BatchResponse) String() string { return proto.CompactTextString(m) }
-func (*BatchResponse) ProtoMessage()    {}
-func (*BatchResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b389fdbc59f03c95, []int{3}
-}
-func (m *BatchResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *BatchResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_BatchResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *BatchResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BatchResponse.Merge(m, src)
-}
-func (m *BatchResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *BatchResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_BatchResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_BatchResponse proto.InternalMessageInfo
-
-func (m *BatchResponse) GetTransactions() [][]byte {
+func (m *Batch) GetTransactions() [][]byte {
 	if m != nil {
 		return m.Transactions
 	}
@@ -217,7 +172,7 @@ func (m *VerificationResponse) Reset()         { *m = VerificationResponse{} }
 func (m *VerificationResponse) String() string { return proto.CompactTextString(m) }
 func (*VerificationResponse) ProtoMessage()    {}
 func (*VerificationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b389fdbc59f03c95, []int{4}
+	return fileDescriptor_b389fdbc59f03c95, []int{3}
 }
 func (m *VerificationResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -256,36 +211,34 @@ func (m *VerificationResponse) GetSuccess() bool {
 func init() {
 	proto.RegisterType((*SubmitRollupTransactionRequest)(nil), "rollkit.SubmitRollupTransactionRequest")
 	proto.RegisterType((*SubmitRollupTransactionResponse)(nil), "rollkit.SubmitRollupTransactionResponse")
-	proto.RegisterType((*BatchRequest)(nil), "rollkit.BatchRequest")
-	proto.RegisterType((*BatchResponse)(nil), "rollkit.BatchResponse")
+	proto.RegisterType((*Batch)(nil), "rollkit.Batch")
 	proto.RegisterType((*VerificationResponse)(nil), "rollkit.VerificationResponse")
 }
 
 func init() { proto.RegisterFile("sequencing/sequencing.proto", fileDescriptor_b389fdbc59f03c95) }
 
 var fileDescriptor_b389fdbc59f03c95 = []byte{
-	// 331 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xcf, 0x4e, 0xc2, 0x40,
-	0x10, 0xc6, 0xbb, 0x6a, 0x04, 0xc7, 0xaa, 0xc9, 0xc6, 0x3f, 0x0d, 0xc4, 0x15, 0x7b, 0x91, 0x13,
-	0x1a, 0x78, 0x00, 0x13, 0x12, 0x63, 0xb8, 0x68, 0x2c, 0x86, 0xab, 0x29, 0x65, 0xd5, 0x8d, 0x75,
-	0x5b, 0x77, 0xa7, 0x89, 0xde, 0x7c, 0x04, 0x1f, 0xcb, 0x23, 0x47, 0x8f, 0x86, 0xbe, 0x88, 0x61,
-	0x5b, 0x0a, 0x1a, 0x41, 0x6f, 0xb3, 0xdf, 0xce, 0x7c, 0xfb, 0xcd, 0x2f, 0x0b, 0x55, 0xcd, 0x9f,
-	0x12, 0x2e, 0x03, 0x21, 0xef, 0x8e, 0xa7, 0x65, 0x23, 0x56, 0x11, 0x46, 0xb4, 0xa4, 0xa2, 0x30,
-	0x7c, 0x10, 0xe8, 0x5e, 0x01, 0xeb, 0x26, 0xfd, 0x47, 0x81, 0x5e, 0x14, 0x86, 0x49, 0x7c, 0xad,
-	0x7c, 0xa9, 0xfd, 0x00, 0x45, 0x24, 0xbd, 0xf1, 0x8c, 0x46, 0x5a, 0x85, 0x35, 0x65, 0xee, 0x6e,
-	0xc4, 0xc0, 0x21, 0x35, 0x52, 0xb7, 0xbd, 0x72, 0x26, 0x74, 0x06, 0x94, 0xc2, 0xca, 0xc0, 0x47,
-	0xdf, 0x59, 0x32, 0xba, 0xa9, 0xdd, 0x43, 0x38, 0x98, 0x6b, 0xa9, 0xe3, 0x48, 0x6a, 0xee, 0x36,
-	0xc1, 0x6e, 0xfb, 0x18, 0xdc, 0x4f, 0xde, 0x70, 0xc1, 0xc6, 0x69, 0x9b, 0x76, 0x48, 0x6d, 0xb9,
-	0x6e, 0x7b, 0xdf, 0x34, 0xb7, 0x05, 0x1b, 0xf9, 0x4c, 0x66, 0xf2, 0xaf, 0xa1, 0x13, 0xd8, 0xee,
-	0x71, 0x25, 0x6e, 0x45, 0xe0, 0xcf, 0x06, 0xa0, 0x0e, 0x94, 0x74, 0x12, 0x04, 0x5c, 0x6b, 0xb3,
-	0x52, 0xd9, 0x9b, 0x1c, 0x9b, 0xaf, 0x04, 0x36, 0xbb, 0x19, 0x2e, 0xae, 0x3a, 0x32, 0x4e, 0x90,
-	0x4a, 0xd8, 0x9b, 0xb3, 0x10, 0x3d, 0x6a, 0xe4, 0x20, 0x1b, 0x8b, 0x29, 0x56, 0xea, 0x7f, 0x37,
-	0xe6, 0x6c, 0xac, 0xa6, 0x07, 0x5b, 0x45, 0x82, 0xcb, 0x04, 0xc7, 0x11, 0x4e, 0xc1, 0x3e, 0xe7,
-	0x78, 0xc1, 0x9f, 0xd1, 0x30, 0xa0, 0x3b, 0x85, 0xdd, 0x2c, 0xc7, 0xca, 0xee, 0x4f, 0xb9, 0xf0,
-	0xec, 0xe5, 0xf4, 0x32, 0x1a, 0x5c, 0xd1, 0x33, 0x58, 0x37, 0xf5, 0xcb, 0x42, 0xc3, 0xfd, 0x42,
-	0xfe, 0x0d, 0xa3, 0x6b, 0xb5, 0x9d, 0xf7, 0x11, 0x23, 0xc3, 0x11, 0x23, 0x9f, 0x23, 0x46, 0xde,
-	0x52, 0x66, 0x0d, 0x53, 0x66, 0x7d, 0xa4, 0xcc, 0xea, 0xaf, 0x9a, 0x9f, 0xd6, 0xfa, 0x0a, 0x00,
-	0x00, 0xff, 0xff, 0xa6, 0x71, 0x63, 0xf2, 0x88, 0x02, 0x00, 0x00,
+	// 318 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0xcd, 0x4e, 0xc2, 0x40,
+	0x18, 0xec, 0xfa, 0x07, 0x7e, 0x56, 0x4c, 0x36, 0x26, 0x36, 0x10, 0x57, 0xdc, 0x8b, 0x24, 0x26,
+	0x48, 0xf0, 0xee, 0x01, 0x0f, 0x86, 0x8b, 0xc4, 0x62, 0xbc, 0x9a, 0x52, 0x56, 0xdd, 0x58, 0xb7,
+	0x75, 0xf7, 0xdb, 0x44, 0x6f, 0x3e, 0x82, 0x8f, 0xe5, 0x91, 0xa3, 0x47, 0x03, 0x2f, 0x62, 0xd8,
+	0x22, 0xa8, 0x01, 0xbd, 0xcd, 0xcc, 0xd7, 0x4e, 0x66, 0x26, 0x0b, 0x15, 0x23, 0x1e, 0xad, 0x50,
+	0xb1, 0x54, 0xb7, 0x47, 0x33, 0x58, 0xcf, 0x74, 0x8a, 0x29, 0x2d, 0xe8, 0x34, 0x49, 0xee, 0x25,
+	0xf2, 0x0b, 0x60, 0x5d, 0xdb, 0x7b, 0x90, 0x18, 0xa6, 0x49, 0x62, 0xb3, 0x4b, 0x1d, 0x29, 0x13,
+	0xc5, 0x28, 0x53, 0x15, 0x8e, 0xff, 0x31, 0x48, 0x2b, 0xb0, 0xae, 0xdd, 0xed, 0x5a, 0xf6, 0x03,
+	0x52, 0x25, 0x35, 0x3f, 0x2c, 0xe6, 0x42, 0xbb, 0x4f, 0x29, 0xac, 0xf4, 0x23, 0x8c, 0x82, 0x25,
+	0xa7, 0x3b, 0xcc, 0xf7, 0x61, 0x6f, 0xa1, 0xa5, 0xc9, 0x52, 0x65, 0x04, 0x3f, 0x84, 0xd5, 0x56,
+	0x84, 0xf1, 0x1d, 0xe5, 0xe0, 0xe3, 0xec, 0x6e, 0x02, 0x52, 0x5d, 0xae, 0xf9, 0xe1, 0x0f, 0x8d,
+	0x37, 0x60, 0xfb, 0x4a, 0x68, 0x79, 0x23, 0xe3, 0xe8, 0xbb, 0x09, 0x0d, 0xa0, 0x60, 0x6c, 0x1c,
+	0x0b, 0x63, 0x5c, 0xac, 0x62, 0xf8, 0x45, 0x9b, 0x2f, 0x04, 0x4a, 0xdd, 0xbc, 0xb2, 0xd0, 0x6d,
+	0x95, 0x59, 0xa4, 0x0a, 0x76, 0x16, 0x84, 0xa2, 0x07, 0xf5, 0xc9, 0x18, 0xf5, 0xbf, 0x97, 0x28,
+	0xd7, 0xfe, 0xff, 0x70, 0xd2, 0xcf, 0x6b, 0x9e, 0xc2, 0xd6, 0x34, 0x41, 0xc7, 0xe2, 0x38, 0x42,
+	0x03, 0xfc, 0x33, 0x81, 0xe7, 0xe2, 0x09, 0xf3, 0xee, 0xa5, 0xa9, 0x9d, 0xe3, 0xe5, 0x5f, 0x9c,
+	0x7b, 0xcd, 0x0e, 0x6c, 0x3a, 0x98, 0xd7, 0x17, 0x9a, 0x9e, 0xc0, 0x86, 0xc3, 0xcf, 0xf3, 0x1d,
+	0x76, 0xa7, 0x7c, 0xde, 0x60, 0xdc, 0x6b, 0x05, 0x6f, 0x43, 0x46, 0x06, 0x43, 0x46, 0x3e, 0x86,
+	0x8c, 0xbc, 0x8e, 0x98, 0x37, 0x18, 0x31, 0xef, 0x7d, 0xc4, 0xbc, 0xde, 0x9a, 0x7b, 0x17, 0xc7,
+	0x9f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xde, 0xcd, 0xfe, 0xc7, 0x36, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -375,7 +328,7 @@ var _SequencerInput_serviceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SequencerOutputClient interface {
 	// SubmitRollupTransaction ...
-	GetNextBatch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*BatchResponse, error)
+	GetNextBatch(ctx context.Context, in *Batch, opts ...grpc.CallOption) (*Batch, error)
 }
 
 type sequencerOutputClient struct {
@@ -386,8 +339,8 @@ func NewSequencerOutputClient(cc *grpc.ClientConn) SequencerOutputClient {
 	return &sequencerOutputClient{cc}
 }
 
-func (c *sequencerOutputClient) GetNextBatch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*BatchResponse, error) {
-	out := new(BatchResponse)
+func (c *sequencerOutputClient) GetNextBatch(ctx context.Context, in *Batch, opts ...grpc.CallOption) (*Batch, error) {
+	out := new(Batch)
 	err := c.cc.Invoke(ctx, "/rollkit.SequencerOutput/GetNextBatch", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -398,14 +351,14 @@ func (c *sequencerOutputClient) GetNextBatch(ctx context.Context, in *BatchReque
 // SequencerOutputServer is the server API for SequencerOutput service.
 type SequencerOutputServer interface {
 	// SubmitRollupTransaction ...
-	GetNextBatch(context.Context, *BatchRequest) (*BatchResponse, error)
+	GetNextBatch(context.Context, *Batch) (*Batch, error)
 }
 
 // UnimplementedSequencerOutputServer can be embedded to have forward compatible implementations.
 type UnimplementedSequencerOutputServer struct {
 }
 
-func (*UnimplementedSequencerOutputServer) GetNextBatch(ctx context.Context, req *BatchRequest) (*BatchResponse, error) {
+func (*UnimplementedSequencerOutputServer) GetNextBatch(ctx context.Context, req *Batch) (*Batch, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNextBatch not implemented")
 }
 
@@ -414,7 +367,7 @@ func RegisterSequencerOutputServer(s *grpc.Server, srv SequencerOutputServer) {
 }
 
 func _SequencerOutput_GetNextBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchRequest)
+	in := new(Batch)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -426,7 +379,7 @@ func _SequencerOutput_GetNextBatch_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/rollkit.SequencerOutput/GetNextBatch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SequencerOutputServer).GetNextBatch(ctx, req.(*BatchRequest))
+		return srv.(SequencerOutputServer).GetNextBatch(ctx, req.(*Batch))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -449,7 +402,7 @@ var _SequencerOutput_serviceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BatchVerifierClient interface {
 	// VerifyBatch ...
-	VerifyBatch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*VerificationResponse, error)
+	VerifyBatch(ctx context.Context, in *Batch, opts ...grpc.CallOption) (*VerificationResponse, error)
 }
 
 type batchVerifierClient struct {
@@ -460,7 +413,7 @@ func NewBatchVerifierClient(cc *grpc.ClientConn) BatchVerifierClient {
 	return &batchVerifierClient{cc}
 }
 
-func (c *batchVerifierClient) VerifyBatch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*VerificationResponse, error) {
+func (c *batchVerifierClient) VerifyBatch(ctx context.Context, in *Batch, opts ...grpc.CallOption) (*VerificationResponse, error) {
 	out := new(VerificationResponse)
 	err := c.cc.Invoke(ctx, "/rollkit.BatchVerifier/VerifyBatch", in, out, opts...)
 	if err != nil {
@@ -472,14 +425,14 @@ func (c *batchVerifierClient) VerifyBatch(ctx context.Context, in *BatchRequest,
 // BatchVerifierServer is the server API for BatchVerifier service.
 type BatchVerifierServer interface {
 	// VerifyBatch ...
-	VerifyBatch(context.Context, *BatchRequest) (*VerificationResponse, error)
+	VerifyBatch(context.Context, *Batch) (*VerificationResponse, error)
 }
 
 // UnimplementedBatchVerifierServer can be embedded to have forward compatible implementations.
 type UnimplementedBatchVerifierServer struct {
 }
 
-func (*UnimplementedBatchVerifierServer) VerifyBatch(ctx context.Context, req *BatchRequest) (*VerificationResponse, error) {
+func (*UnimplementedBatchVerifierServer) VerifyBatch(ctx context.Context, req *Batch) (*VerificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyBatch not implemented")
 }
 
@@ -488,7 +441,7 @@ func RegisterBatchVerifierServer(s *grpc.Server, srv BatchVerifierServer) {
 }
 
 func _BatchVerifier_VerifyBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchRequest)
+	in := new(Batch)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -500,7 +453,7 @@ func _BatchVerifier_VerifyBatch_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/rollkit.BatchVerifier/VerifyBatch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BatchVerifierServer).VerifyBatch(ctx, req.(*BatchRequest))
+		return srv.(BatchVerifierServer).VerifyBatch(ctx, req.(*Batch))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -578,7 +531,7 @@ func (m *SubmitRollupTransactionResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *BatchRequest) Marshal() (dAtA []byte, err error) {
+func (m *Batch) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -588,44 +541,12 @@ func (m *BatchRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *BatchRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *Batch) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *BatchRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Transactions) > 0 {
-		for iNdEx := len(m.Transactions) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Transactions[iNdEx])
-			copy(dAtA[i:], m.Transactions[iNdEx])
-			i = encodeVarintSequencing(dAtA, i, uint64(len(m.Transactions[iNdEx])))
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *BatchResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *BatchResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *BatchResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Batch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -712,22 +633,7 @@ func (m *SubmitRollupTransactionResponse) Size() (n int) {
 	return n
 }
 
-func (m *BatchRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Transactions) > 0 {
-		for _, b := range m.Transactions {
-			l = len(b)
-			n += 1 + l + sovSequencing(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *BatchResponse) Size() (n int) {
+func (m *Batch) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -928,7 +834,7 @@ func (m *SubmitRollupTransactionResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *BatchRequest) Unmarshal(dAtA []byte) error {
+func (m *Batch) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -951,92 +857,10 @@ func (m *BatchRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: BatchRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: Batch: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BatchRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Transactions", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSequencing
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthSequencing
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthSequencing
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Transactions = append(m.Transactions, make([]byte, postIndex-iNdEx))
-			copy(m.Transactions[len(m.Transactions)-1], dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSequencing(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSequencing
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BatchResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSequencing
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BatchResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BatchResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Batch: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

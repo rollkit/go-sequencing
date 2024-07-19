@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/rollkit/go-sequencing"
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 	"google.golang.org/grpc"
 )
@@ -50,21 +51,19 @@ func (c *Client) SubmitRollupTransaction(ctx context.Context, rollupId []byte, t
 }
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
-func (c *Client) GetNextBatch(ctx context.Context, lastBatch [][]byte) ([][]byte, error) {
-	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, &pbseq.BatchRequest{
-		Transactions: lastBatch,
-	})
+func (c *Client) GetNextBatch(ctx context.Context, lastBatch sequencing.Batch) (sequencing.Batch, error) {
+	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, lastBatch.ToProto())
 	if err != nil {
-		return nil, err
+		return sequencing.Batch{}, err
 	}
-	return resp.Transactions, nil
+	b := sequencing.Batch{}
+	b.FromProto(resp)
+	return b, nil
 }
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
-func (c *Client) VerifyBatch(ctx context.Context, batch [][]byte) (bool, error) {
-	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, &pbseq.BatchRequest{
-		Transactions: batch,
-	})
+func (c *Client) VerifyBatch(ctx context.Context, batch sequencing.Batch) (bool, error) {
+	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, batch.ToProto())
 	if err != nil {
 		return false, err
 	}

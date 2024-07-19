@@ -22,23 +22,18 @@ message SubmitRollupTransactionResponse {
 // SequencerOutput ...
 service SequencerOutput {
     // SubmitRollupTransaction ...
-    rpc GetNextBatch(BatchRequest) returns (BatchResponse) {}
+    rpc GetNextBatch(Batch) returns (Batch) {}
 }
 
-// BatchRequest provides the last batch while requesting for the next batch
-message BatchRequest {
-    repeated bytes transactions = 1;
-}
-
-// BatchResponse contains the transaction batch that is last sequenced
-message BatchResponse {
+// Batch holds a list of transactions
+message Batch {
     repeated bytes transactions = 1;
 }
 
 // BatchVerifier
 service BatchVerifier {
     // VerifyBatch ...
-    rpc VerifyBatch(BatchRequest) returns (VerificationResponse) {}
+    rpc VerifyBatch(Batch) returns (VerificationResponse) {}
 }
 
 // VerificationResponse

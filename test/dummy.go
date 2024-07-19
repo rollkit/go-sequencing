@@ -32,7 +32,7 @@ func (tq *TransactionQueue) AddTransaction(tx sequencing.Tx) {
 }
 
 // GetBatch extracts a batch of transactions from the queue
-func (tq *TransactionQueue) GetNextBatch() []sequencing.Tx {
+func (tq *TransactionQueue) GetNextBatch() sequencing.Batch {
 	tq.mu.Lock()
 	defer tq.mu.Unlock()
 
@@ -40,7 +40,7 @@ func (tq *TransactionQueue) GetNextBatch() []sequencing.Tx {
 
 	batch := tq.queue[:batchSize]
 	tq.queue = tq.queue[batchSize:]
-	return batch
+	return sequencing.Batch{Transactions: batch}
 }
 
 // DummySequencer is a dummy sequencer for testing that serves a single rollup
@@ -67,16 +67,24 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId [
 }
 
 // GetNextBatch implements sequencing.Sequencer.
-func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch [][]byte) ([][]byte, error) {
+func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch sequencing.Batch) (sequencing.Batch, error) {
 	batch := d.tq.GetNextBatch()
-	d.lastBatchHash = hashSHA256(batch[0])
+	batchBytes, err := batch.Marshal()
+	if err != nil {
+		return sequencing.Batch{}, err
+	}
+	d.lastBatchHash = hashSHA256(batchBytes)
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
 	return batch, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
-func (d *DummySequencer) VerifyBatch(ctx context.Context, batch [][]byte) (bool, error) {
-	hash := hashSHA256(batch[0])
+func (d *DummySequencer) VerifyBatch(ctx context.Context, batch sequencing.Batch) (bool, error) {
+	batchBytes, err := batch.Marshal()
+	if err != nil {
+		return false, err
+	}
+	hash := hashSHA256(batchBytes)
 	_, ok := d.seenBatches[string(hash)]
 	return ok, nil
 }
