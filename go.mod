@@ -3,6 +3,7 @@ module github.com/rollkit/go-sequencing
 go 1.21.0
 
 require (
+	github.com/gogo/protobuf v1.3.2 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
