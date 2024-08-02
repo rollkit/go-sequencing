@@ -69,19 +69,19 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId [
 }
 
 // GetNextBatch implements sequencing.Sequencer.
-func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch sequencing.Batch) (sequencing.Batch, error) {
+func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
 	batch := d.tq.GetNextBatch()
 	batchBytes, err := batch.Marshal()
 	if err != nil {
-		return sequencing.Batch{}, err
+		return nil, err
 	}
 	d.lastBatchHash = hashSHA256(batchBytes)
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
-	return batch, nil
+	return &batch, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
-func (d *DummySequencer) VerifyBatch(ctx context.Context, batch sequencing.Batch) (bool, error) {
+func (d *DummySequencer) VerifyBatch(ctx context.Context, batch *sequencing.Batch) (bool, error) {
 	batchBytes, err := batch.Marshal()
 	if err != nil {
 		return false, err

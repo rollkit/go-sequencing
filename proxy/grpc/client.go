@@ -52,18 +52,18 @@ func (c *Client) SubmitRollupTransaction(ctx context.Context, rollupId []byte, t
 }
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
-func (c *Client) GetNextBatch(ctx context.Context, lastBatch sequencing.Batch) (sequencing.Batch, error) {
+func (c *Client) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
 	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, lastBatch.ToProto())
 	if err != nil {
-		return sequencing.Batch{}, err
+		return nil, err
 	}
-	b := sequencing.Batch{}
+	b := &sequencing.Batch{}
 	b.FromProto(resp)
 	return b, nil
 }
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
-func (c *Client) VerifyBatch(ctx context.Context, batch sequencing.Batch) (bool, error) {
+func (c *Client) VerifyBatch(ctx context.Context, batch *sequencing.Batch) (bool, error) {
 	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, batch.ToProto())
 	if err != nil {
 		return false, err
