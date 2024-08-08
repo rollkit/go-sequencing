@@ -70,11 +70,28 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId [
 
 // GetNextBatch implements sequencing.Sequencer.
 func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
+	if d.lastBatchHash == nil {
+		if lastBatch != nil {
+			return nil, errors.New("lastBatch is supposed to be nil")
+		}
+	} else if lastBatch == nil {
+		return nil, errors.New("lastBatch is not supposed to be nil")
+	} else {
+		lastBatchBytes, err := lastBatch.Marshal()
+		if err != nil {
+			return nil, err
+		}
+		if !bytes.Equal(d.lastBatchHash, hashSHA256(lastBatchBytes)) {
+			return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
+		}
+	}
+
 	batch := d.tq.GetNextBatch()
 	batchBytes, err := batch.Marshal()
 	if err != nil {
 		return nil, err
 	}
+
 	d.lastBatchHash = hashSHA256(batchBytes)
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
 	return &batch, nil
