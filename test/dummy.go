@@ -74,10 +74,10 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId [
 // GetNextBatch implements sequencing.Sequencer.
 func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
 	if d.lastBatchHash == nil {
-		if lastBatch != nil {
+		if lastBatch.Transactions != nil {
 			return nil, errors.New("lastBatch is supposed to be nil")
 		}
-	} else if lastBatch == nil {
+	} else if lastBatch.Transactions == nil {
 		return nil, errors.New("lastBatch is not supposed to be nil")
 	} else {
 		lastBatchBytes, err := lastBatch.Marshal()

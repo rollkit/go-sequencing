@@ -53,11 +53,8 @@ func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
 func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.Batch, error) {
-	var lastBatch *sequencing.Batch
-	if req.Transactions != nil {
-		lastBatch = &sequencing.Batch{}
-		lastBatch.FromProto(req)
-	}
+	lastBatch := &sequencing.Batch{}
+	lastBatch.FromProto(req)
 	batch, err := s.SequencerOutput.GetNextBatch(ctx, lastBatch)
 	if err != nil {
 		return nil, err
@@ -70,11 +67,8 @@ func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.Batch) (*p
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
 func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.VerificationResponse, error) {
-	var batch *sequencing.Batch
-	if req.Transactions != nil {
-		batch = &sequencing.Batch{}
-		batch.FromProto(req)
-	}
+	batch := &sequencing.Batch{}
+	batch.FromProto(req)
 	ok, err := s.BatchVerifier.VerifyBatch(ctx, batch)
 	if err != nil {
 		return nil, err
