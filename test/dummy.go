@@ -39,6 +39,9 @@ func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
 	defer tq.mu.Unlock()
 
 	size := len(tq.queue)
+	if size == 0 {
+		return &sequencing.Batch{Transactions: nil}
+	}
 	batch := tq.queue[:size]
 	tq.queue = tq.queue[size:]
 	return &sequencing.Batch{Transactions: batch}
