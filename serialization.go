@@ -34,6 +34,10 @@ func byteSlicesToTxs(bytes [][]byte) []Tx {
 
 // Marshal serializes a batch to a byte slice.
 func (batch *Batch) Marshal() ([]byte, error) {
+	var b []byte
+	if batch == nil {
+		return b, nil
+	}
 	pb := batch.ToProto()
 	return pb.Marshal()
 }
