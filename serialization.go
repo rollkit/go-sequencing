@@ -6,7 +6,11 @@ import (
 
 // ToProto serializes a batch to a protobuf message.
 func (batch *Batch) ToProto() *pbseq.Batch {
-	return &pbseq.Batch{Transactions: txsToByteSlices(batch.Transactions)}
+	var txs [][]byte
+	if batch != nil {
+		txs = batch.Transactions
+	}
+	return &pbseq.Batch{Transactions: txsToByteSlices(txs)}
 }
 
 // FromProto deserializes a batch from a protobuf message.

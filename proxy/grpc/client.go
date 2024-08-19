@@ -53,13 +53,7 @@ func (c *Client) SubmitRollupTransaction(ctx context.Context, rollupId []byte, t
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
 func (c *Client) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
-	var lbProto *pbseq.Batch
-	if lastBatch == nil {
-		lbProto = nil
-	} else {
-		lbProto = lastBatch.ToProto()
-	}
-	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, lbProto)
+	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, lastBatch.ToProto())
 	if err != nil {
 		return nil, err
 	}
@@ -70,13 +64,7 @@ func (c *Client) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) 
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
 func (c *Client) VerifyBatch(ctx context.Context, batch *sequencing.Batch) (bool, error) {
-	var bProto *pbseq.Batch
-	if batch == nil {
-		bProto = nil
-	} else {
-		bProto = batch.ToProto()
-	}
-	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, bProto)
+	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, batch.ToProto())
 	if err != nil {
 		return false, err
 	}
