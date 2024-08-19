@@ -39,10 +39,6 @@ func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
 	defer tq.mu.Unlock()
 
 	size := len(tq.queue)
-	if size == 0 {
-		return nil
-	}
-
 	batch := tq.queue[:size]
 	tq.queue = tq.queue[size:]
 	return &sequencing.Batch{Transactions: batch}
@@ -90,8 +86,9 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing
 	}
 
 	batch := d.tq.GetNextBatch()
-	if batch == nil {
-		return nil, nil
+	// If there are no transactions, return empty batch without updating the last batch hash
+	if batch.Transactions == nil {
+		return batch, nil
 	}
 
 	batchBytes, err := batch.Marshal()

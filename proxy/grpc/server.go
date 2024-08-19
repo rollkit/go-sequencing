@@ -59,9 +59,6 @@ func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.Batch) (*p
 	if err != nil {
 		return nil, err
 	}
-	if batch == nil {
-		return nil, nil
-	}
 	return batch.ToProto(), nil
 }
 
