@@ -115,7 +115,8 @@ func (d *DummySequencer) VerifyBatch(ctx context.Context, batch *sequencing.Batc
 // NewDummySequencer creates a new DummySequencer
 func NewDummySequencer() *DummySequencer {
 	return &DummySequencer{
-		tq: NewTransactionQueue(),
+		tq:          NewTransactionQueue(),
+		seenBatches: make(map[string]struct{}, 0),
 	}
 }
 
