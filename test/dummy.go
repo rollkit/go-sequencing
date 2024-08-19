@@ -34,15 +34,18 @@ func (tq *TransactionQueue) AddTransaction(tx sequencing.Tx) {
 }
 
 // GetNextBatch extracts a batch of transactions from the queue
-func (tq *TransactionQueue) GetNextBatch() sequencing.Batch {
+func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
 	tq.mu.Lock()
 	defer tq.mu.Unlock()
 
-	batchSize := len(tq.queue)
+	size := len(tq.queue)
+	if size == 0 {
+		return nil
+	}
 
-	batch := tq.queue[:batchSize]
-	tq.queue = tq.queue[batchSize:]
-	return sequencing.Batch{Transactions: batch}
+	batch := tq.queue[:size]
+	tq.queue = tq.queue[size:]
+	return &sequencing.Batch{Transactions: batch}
 }
 
 // DummySequencer is a dummy sequencer for testing that serves a single rollup
@@ -87,6 +90,10 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing
 	}
 
 	batch := d.tq.GetNextBatch()
+	if batch == nil {
+		return nil, nil
+	}
+
 	batchBytes, err := batch.Marshal()
 	if err != nil {
 		return nil, err
@@ -94,7 +101,7 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing
 
 	d.lastBatchHash = hashSHA256(batchBytes)
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
-	return &batch, nil
+	return batch, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
