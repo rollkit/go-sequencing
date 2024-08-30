@@ -1,5 +1,7 @@
 syntax = "proto3";
-package rollkit;
+package sequencing;
+
+import "google/protobuf/timestamp.proto";
 
 // SequencerInput ...
 service SequencerInput {
@@ -21,8 +23,20 @@ message SubmitRollupTransactionResponse {
 
 // SequencerOutput ...
 service SequencerOutput {
-    // SubmitRollupTransaction ...
-    rpc GetNextBatch(Batch) returns (Batch) {}
+    // GetNextBatch ...
+    rpc GetNextBatch(GetNextBatchRequest) returns (GetNextBatchResponse) {}
+}
+
+// GetNextBatchRequest ...
+message GetNextBatchRequest {
+    // Merkle tree hash of the last batch
+    repeated bytes last_batch_hash = 1;
+}
+
+// GetNextBatchResponse ...
+message GetNextBatchResponse {
+    Batch batch = 1;
+    google.protobuf.Timestamp timestamp = 2;
 }
 
 // Batch holds a list of transactions
@@ -33,10 +47,17 @@ message Batch {
 // BatchVerifier
 service BatchVerifier {
     // VerifyBatch ...
-    rpc VerifyBatch(Batch) returns (VerificationResponse) {}
+    rpc VerifyBatch(VerifyBatchRequest) returns (VerifyBatchResponse) {}
 }
 
-// VerificationResponse
-message VerificationResponse {
-    bool success = 1;
+// VerifyBatchRequest ...
+message VerifyBatchRequest {
+    // Merkle tree hash of the batch
+    repeated bytes batch_hash = 1;
+}
+
+// VerifyBatchResponse
+message VerifyBatchResponse {
+    // status indicates the verification results
+    bool status = 1;
 }
