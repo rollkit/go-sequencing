@@ -30,7 +30,7 @@ service SequencerOutput {
 // GetNextBatchRequest ...
 message GetNextBatchRequest {
     // Merkle tree hash of the last batch
-    repeated bytes last_batch_hash = 1;
+    bytes last_batch_hash = 1;
 }
 
 // GetNextBatchResponse ...
@@ -53,7 +53,7 @@ service BatchVerifier {
 // VerifyBatchRequest ...
 message VerifyBatchRequest {
     // Merkle tree hash of the batch
-    repeated bytes batch_hash = 1;
+    bytes batch_hash = 1;
 }
 
 // VerifyBatchResponse

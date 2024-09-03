@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/rollkit/go-sequencing"
 )
@@ -71,47 +72,39 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId [
 }
 
 // GetNextBatch implements sequencing.Sequencer.
-func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatch *sequencing.Batch) (*sequencing.Batch, error) {
+func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatchHash []byte) (*sequencing.Batch, time.Time, error) {
+	now := time.Now()
 	if d.lastBatchHash == nil {
-		if lastBatch.Transactions != nil {
-			return nil, errors.New("lastBatch is supposed to be nil")
+		if lastBatchHash != nil {
+			return nil, now, errors.New("lastBatch is supposed to be nil")
 		}
-	} else if lastBatch.Transactions == nil {
-		return nil, errors.New("lastBatch is not supposed to be nil")
+	} else if lastBatchHash == nil {
+		return nil, now, errors.New("lastBatch is not supposed to be nil")
 	} else {
-		lastBatchBytes, err := lastBatch.Marshal()
-		if err != nil {
-			return nil, err
-		}
-		if !bytes.Equal(d.lastBatchHash, hashSHA256(lastBatchBytes)) {
-			return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
+		if !bytes.Equal(d.lastBatchHash, lastBatchHash) {
+			return nil, now, errors.New("supplied lastBatch does not match with sequencer last batch")
 		}
 	}
 
 	batch := d.tq.GetNextBatch()
 	// If there are no transactions, return empty batch without updating the last batch hash
 	if batch.Transactions == nil {
-		return batch, nil
+		return batch, now, nil
 	}
 
 	batchBytes, err := batch.Marshal()
 	if err != nil {
-		return nil, err
+		return nil, now, err
 	}
 
 	d.lastBatchHash = hashSHA256(batchBytes)
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
-	return batch, nil
+	return batch, now, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
-func (d *DummySequencer) VerifyBatch(ctx context.Context, batch *sequencing.Batch) (bool, error) {
-	batchBytes, err := batch.Marshal()
-	if err != nil {
-		return false, err
-	}
-	hash := hashSHA256(batchBytes)
-	_, ok := d.seenBatches[string(hash)]
+func (d *DummySequencer) VerifyBatch(ctx context.Context, batchHash []byte) (bool, error) {
+	_, ok := d.seenBatches[string(batchHash)]
 	return ok, nil
 }
 
