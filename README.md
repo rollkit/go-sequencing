@@ -15,8 +15,8 @@ go-sequencing defines a generic sequencing interface for modular blockchains
 | Method        | Params                                                   | Return          |
 | ------------- | -------------------------------------------------------- | --------------- |
 | `SubmitRollupTransaction` | `context.Context`, `rollupId RollupId`, `tx Tx` | `error` |
-| `GetNextBatch` | `context.Context`, `lastBatchHash Hash` | `batch Batch`, `error` |
-| `VerifyBatch` | `context.Context`, `lastBatchHash Hash` | `success bool`, `error` |
+| `GetNextBatch` | `context.Context`, `lastBatchHash Hash` | `batch Batch`, `timestamp Time` `error` |
+| `VerifyBatch` | `context.Context`, `batchHash Hash` | `success bool`, `error` |
 
 Note: `Batch` is []`Tx` and `Tx` is `[]byte`. Also `Hash` and `RollupId` are `[]byte`.
 
