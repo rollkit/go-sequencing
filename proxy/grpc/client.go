@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	types "github.com/cosmos/gogoproto/types"
+
 	"github.com/rollkit/go-sequencing"
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 )

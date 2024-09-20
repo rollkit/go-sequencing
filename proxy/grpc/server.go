@@ -8,6 +8,7 @@ import (
 	"github.com/rollkit/go-sequencing"
 
 	types "github.com/cosmos/gogoproto/types"
+
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 )
 
