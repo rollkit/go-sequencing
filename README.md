@@ -75,5 +75,5 @@ See our Code of Conduct [here](https://docs.celestia.org/community/coc).
 [centralized]: <https://github.com/rollkit/centralized-sequencer>
 [astria]: <https://github.com/rollkit/astria-sequencer>
 [dummy]: https://github.com/rollkit/go-sequencing/blob/main/test/dummy.go
-[proxy]: https://github.com/rollkit/go-sequencing/blob/main/test/main/proxy
+[proxy]: https://github.com/rollkit/go-sequencing/tree/main/proxy
 [gfi]: https://github.com/rollkit/go-da/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
