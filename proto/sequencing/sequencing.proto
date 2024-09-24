@@ -1,0 +1,63 @@
+syntax = "proto3";
+package sequencing;
+
+import "google/protobuf/timestamp.proto";
+
+// SequencerInput ...
+service SequencerInput {
+    // SubmitRollupTransaction ...
+    rpc SubmitRollupTransaction(SubmitRollupTransactionRequest) returns (SubmitRollupTransactionResponse) {}
+}
+
+// SubmitRollupTransactionRequest ...
+message SubmitRollupTransactionRequest {
+    // the unhashed rollup id
+	bytes rollup_id = 1;
+	// the raw data bytes of the rollup transaction
+	bytes data = 2;
+}
+
+// SubmitRollupTransactionResponse ...
+message SubmitRollupTransactionResponse {
+}
+
+// SequencerOutput ...
+service SequencerOutput {
+    // GetNextBatch ...
+    rpc GetNextBatch(GetNextBatchRequest) returns (GetNextBatchResponse) {}
+}
+
+// GetNextBatchRequest ...
+message GetNextBatchRequest {
+    // Merkle tree hash of the last batch
+    bytes last_batch_hash = 1;
+}
+
+// GetNextBatchResponse ...
+message GetNextBatchResponse {
+    Batch batch = 1;
+    google.protobuf.Timestamp timestamp = 2;
+}
+
+// Batch holds a list of transactions
+message Batch {
+    repeated bytes transactions = 1;
+}
+
+// BatchVerifier
+service BatchVerifier {
+    // VerifyBatch ...
+    rpc VerifyBatch(VerifyBatchRequest) returns (VerifyBatchResponse) {}
+}
+
+// VerifyBatchRequest ...
+message VerifyBatchRequest {
+    // Merkle tree hash of the batch
+    bytes batch_hash = 1;
+}
+
+// VerifyBatchResponse
+message VerifyBatchResponse {
+    // status indicates the verification results
+    bool status = 1;
+}
