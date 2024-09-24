@@ -7,6 +7,8 @@ import (
 
 	"github.com/rollkit/go-sequencing"
 
+	types "github.com/cosmos/gogoproto/types"
+
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 )
 
@@ -52,23 +54,23 @@ func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.
 }
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
-func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.Batch, error) {
-	lastBatch := sequencing.Batch{}
-	lastBatch.FromProto(req)
-	batch, err := s.SequencerOutput.GetNextBatch(ctx, lastBatch)
+func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.GetNextBatchRequest) (*pbseq.GetNextBatchResponse, error) {
+	batch, timestamp, err := s.SequencerOutput.GetNextBatch(ctx, req.LastBatchHash[:])
 	if err != nil {
 		return nil, err
 	}
-	return batch.ToProto(), nil
+	ts, err := types.TimestampProto(timestamp)
+	if err != nil {
+		return nil, err
+	}
+	return &pbseq.GetNextBatchResponse{Batch: batch.ToProto(), Timestamp: ts}, nil
 }
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
-func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.Batch) (*pbseq.VerificationResponse, error) {
-	batch := sequencing.Batch{}
-	batch.FromProto(req)
-	ok, err := s.BatchVerifier.VerifyBatch(ctx, batch)
+func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.VerifyBatchRequest) (*pbseq.VerifyBatchResponse, error) {
+	ok, err := s.BatchVerifier.VerifyBatch(ctx, req.BatchHash[:])
 	if err != nil {
 		return nil, err
 	}
-	return &pbseq.VerificationResponse{Success: ok}, nil
+	return &pbseq.VerifyBatchResponse{Status: ok}, nil
 }

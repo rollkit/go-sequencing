@@ -40,8 +40,6 @@ lint: vet
 	@golangci-lint run
 	@echo "--> Running markdownlint"
 	@markdownlint --config .markdownlint.yaml '**/*.md'
-	@echo "--> Running hadolint"
-	@hadolint docker/mockserv.Dockerfile
 	@echo "--> Running yamllint"
 	@yamllint --no-warnings . -c .yamllint.yml
 
@@ -51,6 +49,8 @@ lint: vet
 fmt:
 	@echo "--> Formatting markdownlint"
 	@markdownlint --config .markdownlint.yaml '**/*.md' -f
+	@echo "--> Formatting go"
+	@golangci-lint run --fix
 .PHONY: fmt
 
 ## vet: Run go vet
@@ -66,14 +66,26 @@ test: vet
 .PHONY: test
 
 ### proto-gen: Generate protobuf files. Requires docker.
-#proto-gen:
-#	@echo "--> Generating Protobuf files"
-#	./proto/get_deps.sh
-#	./proto/gen.sh
-#.PHONY: proto-gen
+# proto-gen:
+# 	@echo "--> Generating Protobuf files"
+# 	./proto/gen.sh
+# .PHONY: proto-gen
+
+#? check-proto-deps: Check protobuf deps
+check-proto-deps:
+ifeq (,$(shell which protoc-gen-gocosmos))
+	@go install github.com/cosmos/gogoproto/protoc-gen-gocosmos@latest
+endif
+.PHONY: check-proto-deps
+
+#? proto-gen: Generate protobuf files
+proto-gen: check-proto-deps
+	@echo "Generating Protobuf files"
+	@go run github.com/bufbuild/buf/cmd/buf@latest generate --path proto/sequencing
+.PHONY: proto-gen
 #
 ### proto-lint: Lint protobuf files. Requires docker.
-#proto-lint:
-#	@echo "--> Linting Protobuf files"
-#	@$(DOCKER_BUF) lint --error-format=json
-#.PHONY: proto-lint
+proto-lint:
+	@echo "--> Linting Protobuf files"
+	@$(DOCKER_BUF) lint --error-format=json
+.PHONY: proto-lint
