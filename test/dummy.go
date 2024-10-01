@@ -115,9 +115,13 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 // VerifyBatch implements sequencing.Sequencer.
 func (d *DummySequencer) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
 	d.seenBatchesMutex.Lock()
-	_, ok := d.seenBatches[string(req.BatchHash)]
-	d.seenBatchesMutex.Unlock()
-	return &sequencing.VerifyBatchResponse{Status: ok}, nil
+	defer d.seenBatchesMutex.Unlock()
+	for batchHash := range d.seenBatches {
+		if bytes.Equal([]byte(batchHash), req.BatchHash) {
+			return &sequencing.VerifyBatchResponse{Status: true}, nil
+		}
+	}
+	return &sequencing.VerifyBatchResponse{Status: false}, nil
 }
 
 // NewDummySequencer creates a new DummySequencer
