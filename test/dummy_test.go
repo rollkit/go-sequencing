@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rollkit/go-sequencing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rollkit/go-sequencing"
 )
 
 func TestSubmitRollupTransaction(t *testing.T) {
@@ -40,7 +41,8 @@ func TestSubmitRollupTransaction_RollupIdMismatch(t *testing.T) {
 		RollupId: rollupId1,
 		Tx:       tx1,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req1)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req1)
+	assert.NoError(t, err)
 
 	// Submit a transaction with a different rollup ID (should cause an error)
 	rollupId2 := []byte("test_rollup_id2")
@@ -49,7 +51,7 @@ func TestSubmitRollupTransaction_RollupIdMismatch(t *testing.T) {
 		RollupId: rollupId2,
 		Tx:       tx2,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req2)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req2)
 
 	// Assert that the error is ErrorRollupIdMismatch
 	assert.Error(t, err)
@@ -68,7 +70,8 @@ func TestGetNextBatch(t *testing.T) {
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	assert.NoError(t, err)
 
 	// Get the next batch
 	getBatchReq := sequencing.GetNextBatchRequest{
@@ -102,7 +105,8 @@ func TestVerifyBatch(t *testing.T) {
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	assert.NoError(t, err)
 
 	// Get the next batch to generate batch hash
 	getBatchReq := sequencing.GetNextBatchRequest{

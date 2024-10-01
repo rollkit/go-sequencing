@@ -49,6 +49,7 @@ func (batch *Batch) Unmarshal(data []byte) error {
 	return nil
 }
 
+// Hash returns the hash of a batch.
 func (batch *Batch) Hash() ([]byte, error) {
 	batchBytes, err := batch.Marshal()
 	if err != nil {
