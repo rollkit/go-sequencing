@@ -51,10 +51,12 @@ func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
 type DummySequencer struct {
 	sequencing.RollupId
 
-	tq            *TransactionQueue
-	lastBatchHash []byte
+	tq                 *TransactionQueue
+	lastBatchHash      []byte
+	lastBatchHashMutex sync.RWMutex
 
-	seenBatches map[string]struct{}
+	seenBatches      map[string]struct{}
+	seenBatchesMutex sync.Mutex
 }
 
 // SubmitRollupTransaction implements sequencing.Sequencer.
@@ -73,14 +75,17 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, req sequen
 // GetNextBatch implements sequencing.Sequencer.
 func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRequest) (*sequencing.GetNextBatchResponse, error) {
 	now := time.Now()
-	if d.lastBatchHash == nil {
+	d.lastBatchHashMutex.RLock()
+	lastBatchHash := d.lastBatchHash
+	d.lastBatchHashMutex.RUnlock()
+	if lastBatchHash == nil {
 		if req.LastBatchHash != nil {
 			return nil, errors.New("lastBatch is supposed to be nil")
 		}
 	} else if req.LastBatchHash == nil {
 		return nil, errors.New("lastBatch is not supposed to be nil")
 	} else {
-		if !bytes.Equal(d.lastBatchHash, req.LastBatchHash) {
+		if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
 			return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
 		}
 	}
@@ -97,14 +102,21 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 		return nil, err
 	}
 
+	d.lastBatchHashMutex.Lock()
 	d.lastBatchHash = h
-	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
+	d.lastBatchHashMutex.Unlock()
+
+	d.seenBatchesMutex.Lock()
+	d.seenBatches[string(h)] = struct{}{}
+	d.seenBatchesMutex.Unlock()
 	return batchRes, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
 func (d *DummySequencer) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
+	d.seenBatchesMutex.Lock()
 	_, ok := d.seenBatches[string(req.BatchHash)]
+	d.seenBatchesMutex.Unlock()
 	return &sequencing.VerifyBatchResponse{Status: ok}, nil
 }
 
