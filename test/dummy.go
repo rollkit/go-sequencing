@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"math"
 	"sync"
 	"time"
 
@@ -30,17 +31,39 @@ func (tq *TransactionQueue) AddTransaction(tx sequencing.Tx) {
 	tq.queue = append(tq.queue, tx)
 }
 
+func totalBytes(data [][]byte) int {
+	total := 0
+	for _, sub := range data {
+		total += len(sub)
+	}
+	return total
+}
+
 // GetNextBatch extracts a batch of transactions from the queue
-func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
+func (tq *TransactionQueue) GetNextBatch(maxBytes uint64) *sequencing.Batch {
 	tq.mu.Lock()
 	defer tq.mu.Unlock()
 
-	size := len(tq.queue)
-	if size == 0 {
+	var batch [][]byte
+	batchSize := uint64(len(tq.queue))
+	if batchSize == 0 {
 		return &sequencing.Batch{Transactions: nil}
 	}
-	batch := tq.queue[:size]
-	tq.queue = tq.queue[size:]
+
+	if maxBytes == 0 {
+		maxBytes = math.MaxUint64
+	}
+
+	for {
+		batch = tq.queue[:batchSize]
+		blobSize := totalBytes(batch)
+		if uint64(blobSize) <= maxBytes {
+			break
+		}
+		batchSize = batchSize - 1
+	}
+
+	tq.queue = tq.queue[batchSize:]
 	return &sequencing.Batch{Transactions: batch}
 }
 
@@ -78,7 +101,7 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 		}
 	}
 
-	batch := d.tq.GetNextBatch()
+	batch := d.tq.GetNextBatch(req.MaxBytes)
 	batchRes := &sequencing.GetNextBatchResponse{Batch: batch, Timestamp: now}
 	// If there are no transactions, return empty batch without updating the last batch hash
 	if batch.Transactions == nil {
