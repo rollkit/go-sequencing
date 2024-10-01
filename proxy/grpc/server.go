@@ -55,7 +55,7 @@ func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
 func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.GetNextBatchRequest) (*pbseq.GetNextBatchResponse, error) {
-	resp, err := s.SequencerOutput.GetNextBatch(ctx, sequencing.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash[:]})
+	resp, err := s.SequencerOutput.GetNextBatch(ctx, sequencing.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash})
 	if err != nil {
 		return nil, err
 	}

@@ -55,7 +55,7 @@ func (c *Client) SubmitRollupTransaction(ctx context.Context, req sequencing.Sub
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
 func (c *Client) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRequest) (*sequencing.GetNextBatchResponse, error) {
-	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, &pbseq.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash[:]})
+	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, &pbseq.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash})
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Client) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRe
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
 func (c *Client) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
-	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, &pbseq.VerifyBatchRequest{RollupId: req.RollupId, BatchHash: req.BatchHash[:]})
+	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, &pbseq.VerifyBatchRequest{RollupId: req.RollupId, BatchHash: req.BatchHash})
 	if err != nil {
 		return nil, err
 	}
