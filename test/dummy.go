@@ -3,7 +3,6 @@ package test
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"errors"
 	"sync"
 	"time"
@@ -59,53 +58,54 @@ type DummySequencer struct {
 }
 
 // SubmitRollupTransaction implements sequencing.Sequencer.
-func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, rollupId []byte, tx []byte) error {
+func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, req sequencing.SubmitRollupTransactionRequest) (*sequencing.SubmitRollupTransactionResponse, error) {
 	if d.RollupId == nil {
-		d.RollupId = rollupId
+		d.RollupId = req.RollupId
 	} else {
-		if !bytes.Equal(d.RollupId, rollupId) {
-			return ErrorRollupIdMismatch
+		if !bytes.Equal(d.RollupId, req.RollupId) {
+			return nil, ErrorRollupIdMismatch
 		}
 	}
-	d.tq.AddTransaction(tx)
-	return nil
+	d.tq.AddTransaction(req.Tx)
+	return nil, nil
 }
 
 // GetNextBatch implements sequencing.Sequencer.
-func (d *DummySequencer) GetNextBatch(ctx context.Context, lastBatchHash []byte) (*sequencing.Batch, time.Time, error) {
+func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRequest) (*sequencing.GetNextBatchResponse, error) {
 	now := time.Now()
 	if d.lastBatchHash == nil {
-		if lastBatchHash != nil {
-			return nil, now, errors.New("lastBatch is supposed to be nil")
+		if req.LastBatchHash != nil {
+			return nil, errors.New("lastBatch is supposed to be nil")
 		}
-	} else if lastBatchHash == nil {
-		return nil, now, errors.New("lastBatch is not supposed to be nil")
+	} else if req.LastBatchHash == nil {
+		return nil, errors.New("lastBatch is not supposed to be nil")
 	} else {
-		if !bytes.Equal(d.lastBatchHash, lastBatchHash) {
-			return nil, now, errors.New("supplied lastBatch does not match with sequencer last batch")
+		if !bytes.Equal(d.lastBatchHash, req.LastBatchHash) {
+			return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
 		}
 	}
 
 	batch := d.tq.GetNextBatch()
+	batchRes := &sequencing.GetNextBatchResponse{Batch: batch, Timestamp: now}
 	// If there are no transactions, return empty batch without updating the last batch hash
 	if batch.Transactions == nil {
-		return batch, now, nil
+		return batchRes, nil
 	}
 
-	batchBytes, err := batch.Marshal()
+	h, err := batch.Hash()
 	if err != nil {
-		return nil, now, err
+		return nil, err
 	}
 
-	d.lastBatchHash = hashSHA256(batchBytes)
+	d.lastBatchHash = h
 	d.seenBatches[string(d.lastBatchHash)] = struct{}{}
-	return batch, now, nil
+	return batchRes, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
-func (d *DummySequencer) VerifyBatch(ctx context.Context, batchHash []byte) (bool, error) {
-	_, ok := d.seenBatches[string(batchHash)]
-	return ok, nil
+func (d *DummySequencer) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
+	_, ok := d.seenBatches[string(req.BatchHash)]
+	return &sequencing.VerifyBatchResponse{Status: ok}, nil
 }
 
 // NewDummySequencer creates a new DummySequencer
@@ -114,11 +114,6 @@ func NewDummySequencer() *DummySequencer {
 		tq:          NewTransactionQueue(),
 		seenBatches: make(map[string]struct{}, 0),
 	}
-}
-
-func hashSHA256(data []byte) []byte {
-	hash := sha256.Sum256(data)
-	return hash[:]
 }
 
 var _ sequencing.Sequencer = &DummySequencer{}

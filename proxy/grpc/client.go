@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"time"
 
 	"google.golang.org/grpc"
 
@@ -46,34 +45,36 @@ func (c *Client) Stop() error {
 }
 
 // SubmitRollupTransaction submits a transaction from rollup to sequencer.
-func (c *Client) SubmitRollupTransaction(ctx context.Context, rollupId []byte, tx []byte) error {
+func (c *Client) SubmitRollupTransaction(ctx context.Context, req sequencing.SubmitRollupTransactionRequest) (*sequencing.SubmitRollupTransactionResponse, error) {
 	_, err := c.SequencerInputClient.SubmitRollupTransaction(ctx, &pbseq.SubmitRollupTransactionRequest{
-		RollupId: rollupId,
-		Data:     tx,
+		RollupId: req.RollupId,
+		Data:     req.RollupId,
 	})
-	return err
+	return nil, err
 }
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
-func (c *Client) GetNextBatch(ctx context.Context, lastBatchHash []byte) (*sequencing.Batch, time.Time, error) {
-	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, &pbseq.GetNextBatchRequest{LastBatchHash: lastBatchHash[:]})
+func (c *Client) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRequest) (*sequencing.GetNextBatchResponse, error) {
+	resp, err := c.SequencerOutputClient.GetNextBatch(ctx, &pbseq.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash[:]})
 	if err != nil {
-		return nil, time.Now(), err
+		return nil, err
 	}
 	b := &sequencing.Batch{}
 	b.FromProto(resp.Batch)
 	t, err := types.TimestampFromProto(resp.Timestamp)
 	if err != nil {
-		return nil, time.Now(), err
+		return nil, err
 	}
-	return b, t, nil
+	return &sequencing.GetNextBatchResponse{Batch: b, Timestamp: t}, nil
 }
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
-func (c *Client) VerifyBatch(ctx context.Context, batchHash []byte) (bool, error) {
-	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, &pbseq.VerifyBatchRequest{BatchHash: batchHash[:]})
+func (c *Client) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
+	resp, err := c.BatchVerifierClient.VerifyBatch(ctx, &pbseq.VerifyBatchRequest{RollupId: req.RollupId, BatchHash: req.BatchHash[:]})
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return resp.Status, nil
+	return &sequencing.VerifyBatchResponse{Status: resp.Status}, nil
 }
+
+var _ sequencing.Sequencer = &Client{}
