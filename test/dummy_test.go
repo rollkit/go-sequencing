@@ -44,11 +44,10 @@ func TestTransactionQueue_GetNextBatch(t *testing.T) {
 }
 
 func TestDummySequencer_SubmitRollupTransaction(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Define a test rollup ID and transaction
 	rollupId := []byte("test_rollup_id")
 	tx := []byte("test_transaction")
+	sequencer := NewDummySequencer(rollupId)
 
 	// Submit a transaction
 	req := sequencing.SubmitRollupTransactionRequest{
@@ -68,11 +67,10 @@ func TestDummySequencer_SubmitRollupTransaction(t *testing.T) {
 }
 
 func TestDummySequencer_SubmitEmptyTransaction(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Define a test rollup ID and an empty transaction
 	rollupId := []byte("test_rollup_id")
 	tx := []byte("")
+	sequencer := NewDummySequencer(rollupId)
 
 	// Submit an empty transaction
 	req := sequencing.SubmitRollupTransactionRequest{
@@ -92,13 +90,12 @@ func TestDummySequencer_SubmitEmptyTransaction(t *testing.T) {
 }
 
 func TestDummySequencer_SubmitMultipleTransactions(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
 	tx1 := []byte("transaction_1")
 	tx2 := []byte("transaction_2")
 	tx3 := []byte("transaction_3")
+	sequencer := NewDummySequencer(rollupId)
 
 	// Submit multiple transactions
 	req1 := sequencing.SubmitRollupTransactionRequest{
@@ -130,11 +127,10 @@ func TestDummySequencer_SubmitMultipleTransactions(t *testing.T) {
 }
 
 func TestDummySequencer_GetNextBatch(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Add a transaction to the queue
 	rollupId := []byte("test_rollup_id")
 	tx := []byte("test_transaction")
+	sequencer := NewDummySequencer(rollupId)
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
@@ -162,11 +158,11 @@ func TestDummySequencer_GetNextBatch(t *testing.T) {
 
 // Test retrieving a batch with no transactions
 func TestDummySequencer_GetNextBatch_NoTransactions(t *testing.T) {
-	sequencer := NewDummySequencer()
-
+	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 	// Attempt to retrieve a batch with no transactions in the queue
 	getBatchReq := sequencing.GetNextBatchRequest{
-		RollupId:      []byte("test_rollup_id"),
+		RollupId:      rollupId,
 		LastBatchHash: nil,
 	}
 	batchResp, err := sequencer.GetNextBatch(context.Background(), getBatchReq)
@@ -179,10 +175,9 @@ func TestDummySequencer_GetNextBatch_NoTransactions(t *testing.T) {
 }
 
 func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Submit a transaction
 	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 	tx := []byte("test_transaction")
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
@@ -205,10 +200,9 @@ func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
 
 // Test retrieving a batch with maxBytes limit
 func TestDummySequencer_GetNextBatch_MaxBytesLimit(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 	tx1 := []byte("transaction_1")
 	tx2 := []byte("transaction_2")
 	tx3 := []byte("transaction_3")
@@ -270,10 +264,9 @@ func TestDummySequencer_GetNextBatch_MaxBytesLimit(t *testing.T) {
 }
 
 func TestDummySequencer_VerifyBatch(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Add and retrieve a batch
 	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 	tx := []byte("test_transaction")
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
@@ -294,6 +287,7 @@ func TestDummySequencer_VerifyBatch(t *testing.T) {
 	assert.NoError(t, err)
 	// Verify the batch using the batch hash
 	verifyReq := sequencing.VerifyBatchRequest{
+		RollupId:  rollupId,
 		BatchHash: batchHash,
 	}
 	verifyResp, err := sequencer.VerifyBatch(context.Background(), verifyReq)
@@ -304,11 +298,13 @@ func TestDummySequencer_VerifyBatch(t *testing.T) {
 }
 
 func TestDummySequencer_VerifyEmptyBatch(t *testing.T) {
-	sequencer := NewDummySequencer()
+	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 
 	// Create a request with an empty batch hash
 	emptyBatchHash := []byte{}
 	verifyReq := sequencing.VerifyBatchRequest{
+		RollupId:  rollupId,
 		BatchHash: emptyBatchHash,
 	}
 
@@ -321,10 +317,9 @@ func TestDummySequencer_VerifyEmptyBatch(t *testing.T) {
 }
 
 func TestDummySequencer_VerifyBatchWithMultipleTransactions(t *testing.T) {
-	sequencer := NewDummySequencer()
-
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 	tx1 := []byte("transaction_1")
 	tx2 := []byte("transaction_2")
 
@@ -355,6 +350,7 @@ func TestDummySequencer_VerifyBatchWithMultipleTransactions(t *testing.T) {
 	assert.NoError(t, err)
 	// Verify the batch using the batch hash
 	verifyReq := sequencing.VerifyBatchRequest{
+		RollupId:  rollupId,
 		BatchHash: batchHash,
 	}
 	verifyResp, err := sequencer.VerifyBatch(context.Background(), verifyReq)
@@ -365,10 +361,12 @@ func TestDummySequencer_VerifyBatchWithMultipleTransactions(t *testing.T) {
 }
 
 func TestDummySequencer_VerifyBatch_NotFound(t *testing.T) {
-	sequencer := NewDummySequencer()
+	rollupId := []byte("test_rollup_id")
+	sequencer := NewDummySequencer(rollupId)
 
 	// Try verifying a batch with an invalid hash
 	verifyReq := sequencing.VerifyBatchRequest{
+		RollupId:  rollupId,
 		BatchHash: []byte("invalid_hash"),
 	}
 	verifyResp, err := sequencer.VerifyBatch(context.Background(), verifyReq)

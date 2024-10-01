@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"errors"
 	"math"
 	"sync"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/rollkit/go-sequencing"
 )
+
+var ErrInvalidRollupId = errors.New("invalid rollup id")
 
 // TransactionQueue is a queue of transactions
 type TransactionQueue struct {
@@ -54,13 +57,17 @@ func (tq *TransactionQueue) GetNextBatch(maxBytes uint64) *sequencing.Batch {
 		maxBytes = math.MaxUint64
 	}
 
-	for {
+	for batchSize > 0 {
 		batch = tq.queue[:batchSize]
 		blobSize := totalBytes(batch)
 		if uint64(blobSize) <= maxBytes {
 			break
 		}
 		batchSize = batchSize - 1
+	}
+	if batchSize == 0 {
+		// No transactions can fit within maxBytes
+		return &sequencing.Batch{Transactions: nil}
 	}
 
 	tq.queue = tq.queue[batchSize:]
@@ -69,6 +76,7 @@ func (tq *TransactionQueue) GetNextBatch(maxBytes uint64) *sequencing.Batch {
 
 // DummySequencer is a dummy sequencer for testing that serves a single rollup
 type DummySequencer struct {
+	rollupId           []byte
 	tq                 *TransactionQueue
 	lastBatchHash      []byte
 	lastBatchHashMutex sync.RWMutex
@@ -79,26 +87,29 @@ type DummySequencer struct {
 
 // SubmitRollupTransaction implements sequencing.Sequencer.
 func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, req sequencing.SubmitRollupTransactionRequest) (*sequencing.SubmitRollupTransactionResponse, error) {
+	if !d.isValid(req.RollupId) {
+		return nil, ErrInvalidRollupId
+	}
 	d.tq.AddTransaction(req.Tx)
 	return &sequencing.SubmitRollupTransactionResponse{}, nil
 }
 
 // GetNextBatch implements sequencing.Sequencer.
 func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNextBatchRequest) (*sequencing.GetNextBatchResponse, error) {
+	if !d.isValid(req.RollupId) {
+		return nil, ErrInvalidRollupId
+	}
 	now := time.Now()
 	d.lastBatchHashMutex.RLock()
 	lastBatchHash := d.lastBatchHash
 	d.lastBatchHashMutex.RUnlock()
-	if lastBatchHash == nil {
-		if req.LastBatchHash != nil {
-			return nil, errors.New("lastBatch is supposed to be nil")
-		}
-	} else if req.LastBatchHash == nil {
+
+	if lastBatchHash == nil && req.LastBatchHash != nil {
+		return nil, errors.New("lastBatch is supposed to be nil")
+	} else if lastBatchHash != nil && req.LastBatchHash == nil {
 		return nil, errors.New("lastBatch is not supposed to be nil")
-	} else {
-		if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
-			return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
-		}
+	} else if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
+		return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
 	}
 
 	batch := d.tq.GetNextBatch(req.MaxBytes)
@@ -118,26 +129,33 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 	d.lastBatchHashMutex.Unlock()
 
 	d.seenBatchesMutex.Lock()
-	d.seenBatches[string(h)] = struct{}{}
+	d.seenBatches[hex.EncodeToString(h)] = struct{}{}
 	d.seenBatchesMutex.Unlock()
 	return batchRes, nil
 }
 
 // VerifyBatch implements sequencing.Sequencer.
 func (d *DummySequencer) VerifyBatch(ctx context.Context, req sequencing.VerifyBatchRequest) (*sequencing.VerifyBatchResponse, error) {
+	if !d.isValid(req.RollupId) {
+		return nil, ErrInvalidRollupId
+	}
 	d.seenBatchesMutex.Lock()
 	defer d.seenBatchesMutex.Unlock()
-	for batchHash := range d.seenBatches {
-		if bytes.Equal([]byte(batchHash), req.BatchHash) {
-			return &sequencing.VerifyBatchResponse{Status: true}, nil
-		}
+	key := hex.EncodeToString(req.BatchHash)
+	if _, exists := d.seenBatches[key]; exists {
+		return &sequencing.VerifyBatchResponse{Status: true}, nil
 	}
 	return &sequencing.VerifyBatchResponse{Status: false}, nil
 }
 
+func (d *DummySequencer) isValid(rollupId []byte) bool {
+	return bytes.Equal(d.rollupId, rollupId)
+}
+
 // NewDummySequencer creates a new DummySequencer
-func NewDummySequencer() *DummySequencer {
+func NewDummySequencer(rollupId []byte) *DummySequencer {
 	return &DummySequencer{
+		rollupId:    rollupId,
 		tq:          NewTransactionQueue(),
 		seenBatches: make(map[string]struct{}, 0),
 	}
