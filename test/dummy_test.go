@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rollkit/go-sequencing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rollkit/go-sequencing"
 )
 
 func TestTransactionQueue_AddTransaction(t *testing.T) {
@@ -75,7 +76,8 @@ func TestDummySequencer_GetNextBatch(t *testing.T) {
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	assert.NoError(t, err)
 
 	// Retrieve the next batch
 	getBatchReq := sequencing.GetNextBatchRequest{
@@ -105,14 +107,15 @@ func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	assert.NoError(t, err)
 
 	// Retrieve the next batch
 	getBatchReq := sequencing.GetNextBatchRequest{
 		RollupId:      rollupId,
 		LastBatchHash: []byte("invalid_hash"),
 	}
-	_, err := sequencer.GetNextBatch(context.Background(), getBatchReq)
+	_, err = sequencer.GetNextBatch(context.Background(), getBatchReq)
 
 	// Assert that the batch hash mismatch error is returned
 	assert.Error(t, err)
@@ -129,7 +132,8 @@ func TestDummySequencer_VerifyBatch(t *testing.T) {
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	assert.NoError(t, err)
 
 	// Get the next batch to generate batch hash
 	getBatchReq := sequencing.GetNextBatchRequest{
