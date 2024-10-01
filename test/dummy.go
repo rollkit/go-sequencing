@@ -12,6 +12,7 @@ import (
 	"github.com/rollkit/go-sequencing"
 )
 
+// ErrInvalidRollupId is returned when the rollup id is invalid
 var ErrInvalidRollupId = errors.New("invalid rollup id")
 
 // TransactionQueue is a queue of transactions
