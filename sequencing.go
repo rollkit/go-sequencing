@@ -15,13 +15,18 @@ type Sequencer interface {
 // SequencerInput provides a method for submitting a transaction from rollup to sequencer
 type SequencerInput interface {
 	// SubmitRollupTransaction submits a transaction from rollup to sequencer
+	// RollupId is the unique identifier for the rollup chain
+	// Tx is the transaction to submit
+	// returns an error if any from the sequencer
 	SubmitRollupTransaction(ctx context.Context, req SubmitRollupTransactionRequest) (*SubmitRollupTransactionResponse, error)
 }
 
 // SequencerOutput provides a method for getting the next batch of transactions from sequencer to rollup
 type SequencerOutput interface {
 	// GetNextBatch returns the next batch of transactions from sequencer to rollup
-	// lastBatch is the last batch of transactions received from the sequencer
+	// RollupId is the unique identifier for the rollup chain
+	// LastBatchHash is the cryptographic hash of the last batch received by the rollup
+	// MaxBytes is the maximum number of bytes to return in the batch
 	// returns the next batch of transactions and an error if any from the sequencer
 	GetNextBatch(ctx context.Context, req GetNextBatchRequest) (*GetNextBatchResponse, error)
 }
@@ -29,6 +34,9 @@ type SequencerOutput interface {
 // BatchVerifier provides a method for verifying a batch of transactions received from the sequencer
 type BatchVerifier interface {
 	// VerifyBatch verifies a batch of transactions received from the sequencer
+	// RollupId is the unique identifier for the rollup chain
+	// BatchHash is the cryptographic hash of the batch to verify
+	// returns a boolean indicating if the batch is valid and an error if any from the sequencer
 	VerifyBatch(ctx context.Context, req VerifyBatchRequest) (*VerifyBatchResponse, error)
 }
 

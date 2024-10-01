@@ -27,7 +27,7 @@ func TestSubmitRollupTransaction(t *testing.T) {
 	// Assert no error
 	assert.NoError(t, err)
 	// Assert the transaction was successfully added to the queue
-	assert.Nil(t, resp)
+	assert.NotNil(t, resp)
 	assert.Equal(t, rollupId, sequencer.RollupId)
 }
 

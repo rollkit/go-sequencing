@@ -67,7 +67,7 @@ func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, req sequen
 		}
 	}
 	d.tq.AddTransaction(req.Tx)
-	return nil, nil
+	return &sequencing.SubmitRollupTransactionResponse{}, nil
 }
 
 // GetNextBatch implements sequencing.Sequencer.
