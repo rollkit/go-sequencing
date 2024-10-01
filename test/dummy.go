@@ -10,9 +10,6 @@ import (
 	"github.com/rollkit/go-sequencing"
 )
 
-// ErrorRollupIdMismatch is returned when the rollup id does not match
-var ErrorRollupIdMismatch = errors.New("rollup id mismatch")
-
 // TransactionQueue is a queue of transactions
 type TransactionQueue struct {
 	queue []sequencing.Tx
@@ -49,8 +46,6 @@ func (tq *TransactionQueue) GetNextBatch() *sequencing.Batch {
 
 // DummySequencer is a dummy sequencer for testing that serves a single rollup
 type DummySequencer struct {
-	sequencing.RollupId
-
 	tq                 *TransactionQueue
 	lastBatchHash      []byte
 	lastBatchHashMutex sync.RWMutex
@@ -61,13 +56,6 @@ type DummySequencer struct {
 
 // SubmitRollupTransaction implements sequencing.Sequencer.
 func (d *DummySequencer) SubmitRollupTransaction(ctx context.Context, req sequencing.SubmitRollupTransactionRequest) (*sequencing.SubmitRollupTransactionResponse, error) {
-	if d.RollupId == nil {
-		d.RollupId = req.RollupId
-	} else {
-		if !bytes.Equal(d.RollupId, req.RollupId) {
-			return nil, ErrorRollupIdMismatch
-		}
-	}
 	d.tq.AddTransaction(req.Tx)
 	return &sequencing.SubmitRollupTransactionResponse{}, nil
 }
