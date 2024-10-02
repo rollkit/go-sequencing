@@ -29,8 +29,12 @@ service SequencerOutput {
 
 // GetNextBatchRequest ...
 message GetNextBatchRequest {
+    // the unhashed rollup id
+    bytes rollup_id = 1;
     // Merkle tree hash of the last batch
-    bytes last_batch_hash = 1;
+    bytes last_batch_hash = 2;
+    // maximum bytes that execution client can support per block
+    uint64 max_bytes = 3;
 }
 
 // GetNextBatchResponse ...
@@ -52,8 +56,10 @@ service BatchVerifier {
 
 // VerifyBatchRequest ...
 message VerifyBatchRequest {
+    // the unhashed rollup id
+    bytes rollup_id = 1;
     // Merkle tree hash of the batch
-    bytes batch_hash = 1;
+    bytes batch_hash = 2;
 }
 
 // VerifyBatchResponse
