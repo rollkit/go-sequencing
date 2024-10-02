@@ -48,7 +48,7 @@ func (c *Client) Stop() error {
 func (c *Client) SubmitRollupTransaction(ctx context.Context, req sequencing.SubmitRollupTransactionRequest) (*sequencing.SubmitRollupTransactionResponse, error) {
 	_, err := c.SequencerInputClient.SubmitRollupTransaction(ctx, &pbseq.SubmitRollupTransactionRequest{
 		RollupId: req.RollupId,
-		Data:     req.RollupId,
+		Data:     req.Tx,
 	})
 	return nil, err
 }
