@@ -46,7 +46,7 @@ type proxyVerificationSrv struct {
 
 // SubmitRollupTransaction submits a transaction from rollup to sequencer.
 func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.SubmitRollupTransactionRequest) (*pbseq.SubmitRollupTransactionResponse, error) {
-	err := s.SequencerInput.SubmitRollupTransaction(ctx, req.RollupId, req.Data)
+	_, err := s.SequencerInput.SubmitRollupTransaction(ctx, sequencing.SubmitRollupTransactionRequest{RollupId: req.RollupId, Tx: req.Data})
 	if err != nil {
 		return nil, err
 	}
@@ -55,22 +55,22 @@ func (s *proxyInputSrv) SubmitRollupTransaction(ctx context.Context, req *pbseq.
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
 func (s *proxyOutputSrv) GetNextBatch(ctx context.Context, req *pbseq.GetNextBatchRequest) (*pbseq.GetNextBatchResponse, error) {
-	batch, timestamp, err := s.SequencerOutput.GetNextBatch(ctx, req.LastBatchHash[:])
+	resp, err := s.SequencerOutput.GetNextBatch(ctx, sequencing.GetNextBatchRequest{RollupId: req.RollupId, LastBatchHash: req.LastBatchHash})
 	if err != nil {
 		return nil, err
 	}
-	ts, err := types.TimestampProto(timestamp)
+	ts, err := types.TimestampProto(resp.Timestamp)
 	if err != nil {
 		return nil, err
 	}
-	return &pbseq.GetNextBatchResponse{Batch: batch.ToProto(), Timestamp: ts}, nil
+	return &pbseq.GetNextBatchResponse{Batch: resp.Batch.ToProto(), Timestamp: ts}, nil
 }
 
 // VerifyBatch verifies a batch of transactions received from the sequencer.
 func (s *proxyVerificationSrv) VerifyBatch(ctx context.Context, req *pbseq.VerifyBatchRequest) (*pbseq.VerifyBatchResponse, error) {
-	ok, err := s.BatchVerifier.VerifyBatch(ctx, req.BatchHash[:])
+	resp, err := s.BatchVerifier.VerifyBatch(ctx, sequencing.VerifyBatchRequest{BatchHash: req.BatchHash})
 	if err != nil {
 		return nil, err
 	}
-	return &pbseq.VerifyBatchResponse{Status: ok}, nil
+	return &pbseq.VerifyBatchResponse{Status: resp.Status}, nil
 }

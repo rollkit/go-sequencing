@@ -1,6 +1,8 @@
 package sequencing
 
 import (
+	"crypto/sha256"
+
 	pbseq "github.com/rollkit/go-sequencing/types/pb/sequencing"
 )
 
@@ -45,4 +47,14 @@ func (batch *Batch) Unmarshal(data []byte) error {
 	}
 	batch.FromProto(&pb)
 	return nil
+}
+
+// Hash returns the hash of a batch.
+func (batch *Batch) Hash() ([]byte, error) {
+	batchBytes, err := batch.Marshal()
+	if err != nil {
+		return nil, err
+	}
+	hash := sha256.Sum256(batchBytes)
+	return hash[:], nil
 }
