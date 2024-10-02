@@ -13,6 +13,9 @@ updates:
         applies-to: version-updates
         update-types:
           - "minor"
+    commit-message:
+      include: "scope"
+      prefix: "chore"
   - package-ecosystem: gomod
     directory: "/"
     schedule:
@@ -26,3 +29,6 @@ updates:
         applies-to: version-updates
         update-types:
           - "minor"
+    commit-message:
+      include: "scope"
+      prefix: "chore"
