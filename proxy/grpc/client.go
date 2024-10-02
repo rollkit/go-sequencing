@@ -50,7 +50,10 @@ func (c *Client) SubmitRollupTransaction(ctx context.Context, req sequencing.Sub
 		RollupId: req.RollupId,
 		Data:     req.Tx,
 	})
-	return nil, err
+	if err != nil {
+		return nil, err
+	}
+	return &sequencing.SubmitRollupTransactionResponse{}, nil
 }
 
 // GetNextBatch returns the next batch of transactions from sequencer to rollup.
