@@ -4,7 +4,7 @@ go 1.21.0
 
 require (
 	github.com/cosmos/gogoproto v1.7.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	google.golang.org/grpc v1.67.1
 )
 
