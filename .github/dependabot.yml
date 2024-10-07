@@ -15,7 +15,7 @@ updates:
           - "minor"
     commit-message:
       include: "scope"
-      prefix: "chore"
+      prefix: "build"
   - package-ecosystem: gomod
     directory: "/"
     schedule:
@@ -31,4 +31,4 @@ updates:
           - "minor"
     commit-message:
       include: "scope"
-      prefix: "chore"
+      prefix: "build"
