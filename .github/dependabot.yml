@@ -16,6 +16,9 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    commit-message:
+      include: "scope"
+      prefix: "build"
   - package-ecosystem: gomod
     directory: "/"
     schedule:
@@ -31,6 +34,9 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    commit-message:
+      include: "scope"
+      prefix: "build"
   # All other dependencies
   # Trigger weekly, group patch updates
   - package-ecosystem: github-actions
@@ -45,6 +51,9 @@ updates:
         applies-to: version-updates
         update-types:
           - "patch"
+    commit-message:
+      include: "scope"
+      prefix: "build"
   - package-ecosystem: gomod
     directory: "/"
     schedule:
@@ -57,3 +66,6 @@ updates:
         applies-to: version-updates
         update-types:
           - "patch"
+    commit-message:
+      include: "scope"
+      prefix: "build"
