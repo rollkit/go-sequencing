@@ -5,8 +5,9 @@ import (
 	"math"
 	"testing"
 
-	"github.com/rollkit/go-sequencing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rollkit/go-sequencing"
 )
 
 func TestMultiRollupSequencer_SubmitRollupTransaction(t *testing.T) {
