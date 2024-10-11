@@ -60,7 +60,7 @@ func (d *MultiRollupSequencer) GetNextBatch(ctx context.Context, req sequencing.
 	batch := rollup.tq.GetNextBatch(req.MaxBytes)
 	batchRes := &sequencing.GetNextBatchResponse{Batch: batch, Timestamp: now}
 	// If there are no transactions, return empty batch without updating the last batch hash
-	if batch.Transactions == nil {
+	if len(batch.Transactions) == 0 {
 		return batchRes, nil
 	}
 
