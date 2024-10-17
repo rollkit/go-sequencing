@@ -2,8 +2,9 @@ package test
 
 import (
 	"context"
+	"crypto/rand"
 	"math"
-	"math/rand"
+	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -161,8 +162,12 @@ func TestMultiRollupSequencer_MultipleRollups(t *testing.T) {
 func TestMultiRollupSequencer(t *testing.T) {
 	// Test with 1 rollup
 	testMultiRollupSequencer(t, 1)
+
 	// Test with 2 to 5 rollups
-	numRollups := rand.Intn(4) + 2
+	r, err := rand.Int(rand.Reader, big.NewInt(4)) // Generates a number between 0 and 3
+	assert.NoError(t, err)
+
+	numRollups := int(r.Int64() + 2) // Adjust range to be between 2 and 5, cast to int
 	testMultiRollupSequencer(t, numRollups)
 }
 
