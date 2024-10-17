@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math"
 	"sync"
 	"time"
@@ -105,12 +106,10 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 	lastBatchHash := d.lastBatchHash
 	d.lastBatchHashMutex.RUnlock()
 
-	if lastBatchHash == nil && req.LastBatchHash != nil {
-		return nil, errors.New("lastBatch is supposed to be nil")
-	} else if lastBatchHash != nil && req.LastBatchHash == nil {
-		return nil, errors.New("lastBatch is not supposed to be nil")
-	} else if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
-		return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
+	if (lastBatchHash == nil && req.LastBatchHash != nil) || (lastBatchHash != nil && req.LastBatchHash == nil) {
+		return nil, fmt.Errorf("nil mismatch: lastBatchHash = %v, req.LastBatchHash = %v", lastBatchHash, req.LastBatchHash)
+	} else if lastBatchHash != nil && !bytes.Equal(lastBatchHash, req.LastBatchHash) {
+		return nil, fmt.Errorf("batch hash mismatch: lastBatchHash = %x, req.LastBatchHash = %x", lastBatchHash, req.LastBatchHash)
 	}
 
 	batch := d.tq.GetNextBatch(req.MaxBytes)

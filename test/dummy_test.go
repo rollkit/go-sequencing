@@ -2,6 +2,9 @@ package test
 
 import (
 	"context"
+	"crypto/rand"
+	"fmt"
+	"io"
 	"math"
 	"testing"
 	"time"
@@ -14,7 +17,8 @@ import (
 func TestTransactionQueue_AddTransaction(t *testing.T) {
 	queue := NewTransactionQueue()
 
-	tx1 := []byte("transaction_1")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	queue.AddTransaction(tx1)
 
 	// Check that the transaction was added
@@ -27,8 +31,10 @@ func TestTransactionQueue_GetNextBatch(t *testing.T) {
 	queue := NewTransactionQueue()
 
 	// Add multiple transactions
-	tx1 := []byte("transaction_1")
-	tx2 := []byte("transaction_2")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx2, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	queue.AddTransaction(tx1)
 	queue.AddTransaction(tx2)
 
@@ -46,7 +52,8 @@ func TestTransactionQueue_GetNextBatch(t *testing.T) {
 func TestDummySequencer_SubmitRollupTransaction(t *testing.T) {
 	// Define a test rollup ID and transaction
 	rollupId := []byte("test_rollup_id")
-	tx := []byte("test_transaction")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	sequencer := NewDummySequencer(rollupId)
 
 	// Submit a transaction
@@ -92,9 +99,12 @@ func TestDummySequencer_SubmitEmptyTransaction(t *testing.T) {
 func TestDummySequencer_SubmitMultipleTransactions(t *testing.T) {
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
-	tx1 := []byte("transaction_1")
-	tx2 := []byte("transaction_2")
-	tx3 := []byte("transaction_3")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx2, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx3, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	sequencer := NewDummySequencer(rollupId)
 
 	// Submit multiple transactions
@@ -111,7 +121,7 @@ func TestDummySequencer_SubmitMultipleTransactions(t *testing.T) {
 		Tx:       tx3,
 	}
 
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req1)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req1)
 	assert.NoError(t, err)
 	_, err = sequencer.SubmitRollupTransaction(context.Background(), req2)
 	assert.NoError(t, err)
@@ -129,13 +139,14 @@ func TestDummySequencer_SubmitMultipleTransactions(t *testing.T) {
 func TestDummySequencer_GetNextBatch(t *testing.T) {
 	// Add a transaction to the queue
 	rollupId := []byte("test_rollup_id")
-	tx := []byte("test_transaction")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	sequencer := NewDummySequencer(rollupId)
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req)
 	assert.NoError(t, err)
 
 	// Retrieve the next batch
@@ -178,12 +189,13 @@ func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
 	// Submit a transaction
 	rollupId := []byte("test_rollup_id")
 	sequencer := NewDummySequencer(rollupId)
-	tx := []byte("test_transaction")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req)
 	assert.NoError(t, err)
 
 	// Retrieve the next batch
@@ -195,7 +207,7 @@ func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
 
 	// Assert that the batch hash mismatch error is returned
 	assert.Error(t, err)
-	assert.Equal(t, "lastBatch is supposed to be nil", err.Error())
+	assert.ErrorContains(t, err, "nil mismatch", "unexpected error message")
 }
 
 // Test retrieving a batch with maxBytes limit
@@ -203,9 +215,12 @@ func TestDummySequencer_GetNextBatch_MaxBytesLimit(t *testing.T) {
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
 	sequencer := NewDummySequencer(rollupId)
-	tx1 := []byte("transaction_1")
-	tx2 := []byte("transaction_2")
-	tx3 := []byte("transaction_3")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx2, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx3, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit multiple transactions
 	req1 := sequencing.SubmitRollupTransactionRequest{
@@ -221,7 +236,7 @@ func TestDummySequencer_GetNextBatch_MaxBytesLimit(t *testing.T) {
 		Tx:       tx3,
 	}
 
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req1)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req1)
 	assert.NoError(t, err)
 	_, err = sequencer.SubmitRollupTransaction(context.Background(), req2)
 	assert.NoError(t, err)
@@ -267,12 +282,13 @@ func TestDummySequencer_VerifyBatch(t *testing.T) {
 	// Add and retrieve a batch
 	rollupId := []byte("test_rollup_id")
 	sequencer := NewDummySequencer(rollupId)
-	tx := []byte("test_transaction")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req)
 	assert.NoError(t, err)
 
 	// Get the next batch to generate batch hash
@@ -320,8 +336,10 @@ func TestDummySequencer_VerifyBatchWithMultipleTransactions(t *testing.T) {
 	// Define a test rollup ID and multiple transactions
 	rollupId := []byte("test_rollup_id")
 	sequencer := NewDummySequencer(rollupId)
-	tx1 := []byte("transaction_1")
-	tx2 := []byte("transaction_2")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx2, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit multiple transactions
 	req1 := sequencing.SubmitRollupTransactionRequest{
@@ -333,7 +351,7 @@ func TestDummySequencer_VerifyBatchWithMultipleTransactions(t *testing.T) {
 		Tx:       tx2,
 	}
 
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req1)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req1)
 	assert.NoError(t, err)
 	_, err = sequencer.SubmitRollupTransaction(context.Background(), req2)
 	assert.NoError(t, err)
@@ -374,4 +392,17 @@ func TestDummySequencer_VerifyBatch_NotFound(t *testing.T) {
 	// Assert no error and that the batch is not found
 	assert.NoError(t, err)
 	assert.False(t, verifyResp.Status)
+}
+
+// GenerateSecureRandomBytes generates cryptographically secure random bytes of the given length.
+func GenerateSecureRandomBytes(length int) ([]byte, error) {
+	if length <= 0 {
+		return nil, fmt.Errorf("invalid length: %d, must be greater than 0", length)
+	}
+
+	buf := make([]byte, length)
+	if _, err := io.ReadFull(rand.Reader, buf); err != nil {
+		return nil, fmt.Errorf("failed to generate random bytes: %w", err)
+	}
+	return buf, nil
 }

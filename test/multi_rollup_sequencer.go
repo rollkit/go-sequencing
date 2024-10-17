@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
-	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -49,12 +49,10 @@ func (d *MultiRollupSequencer) GetNextBatch(ctx context.Context, req sequencing.
 	lastBatchHash := rollup.lastBatchHash
 	rollup.lastBatchHashMutex.RUnlock()
 
-	if lastBatchHash == nil && req.LastBatchHash != nil {
-		return nil, errors.New("lastBatch is supposed to be nil")
-	} else if lastBatchHash != nil && req.LastBatchHash == nil {
-		return nil, errors.New("lastBatch is not supposed to be nil")
-	} else if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
-		return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
+	if (lastBatchHash == nil && req.LastBatchHash != nil) || (lastBatchHash != nil && req.LastBatchHash == nil) {
+		return nil, fmt.Errorf("nil mismatch: lastBatchHash = %v, req.LastBatchHash = %v", lastBatchHash, req.LastBatchHash)
+	} else if lastBatchHash != nil && !bytes.Equal(lastBatchHash, req.LastBatchHash) {
+		return nil, fmt.Errorf("batch hash mismatch: lastBatchHash = %x, req.LastBatchHash = %x", lastBatchHash, req.LastBatchHash)
 	}
 
 	batch := rollup.tq.GetNextBatch(req.MaxBytes)
@@ -99,16 +97,12 @@ func (d *MultiRollupSequencer) VerifyBatch(ctx context.Context, req sequencing.V
 func (d *MultiRollupSequencer) getOrCreateRollup(rollupId []byte) (*RollupData, error) {
 	rollupKey := hex.EncodeToString(rollupId)
 
-	d.rollupsMutex.RLock()
+	d.rollupsMutex.Lock()
+	defer d.rollupsMutex.Unlock()
 	rollup, exists := d.rollups[rollupKey]
-	d.rollupsMutex.RUnlock()
-
 	if exists {
 		return rollup, nil
 	}
-
-	d.rollupsMutex.Lock()
-	defer d.rollupsMutex.Unlock()
 
 	// Double-check existence after acquiring write lock
 	if rollup, exists := d.rollups[rollupKey]; exists {

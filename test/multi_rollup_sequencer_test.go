@@ -14,7 +14,8 @@ func TestMultiRollupSequencer_SubmitRollupTransaction(t *testing.T) {
 	sequencer := NewMultiRollupSequencer()
 
 	rollupId := []byte("test-rollup")
-	tx := []byte("transaction data")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit the transaction
 	req := sequencing.SubmitRollupTransactionRequest{
@@ -39,14 +40,15 @@ func TestMultiRollupSequencer_GetNextBatch(t *testing.T) {
 	sequencer := NewMultiRollupSequencer()
 
 	rollupId := []byte("test-rollup")
-	tx := []byte("transaction data")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit the transaction
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req)
 	assert.NoError(t, err)
 
 	// Get next batch
@@ -68,14 +70,15 @@ func TestMultiRollupSequencer_VerifyBatch(t *testing.T) {
 	sequencer := NewMultiRollupSequencer()
 
 	rollupId := []byte("test-rollup")
-	tx := []byte("transaction data")
+	tx, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit the transaction
 	req := sequencing.SubmitRollupTransactionRequest{
 		RollupId: rollupId,
 		Tx:       tx,
 	}
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req)
 	assert.NoError(t, err)
 
 	// Get the next batch to update the last batch hash
@@ -106,8 +109,10 @@ func TestMultiRollupSequencer_MultipleRollups(t *testing.T) {
 
 	rollupId1 := []byte("rollup-1")
 	rollupId2 := []byte("rollup-2")
-	tx1 := []byte("tx data 1")
-	tx2 := []byte("tx data 2")
+	tx1, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
+	tx2, err := GenerateSecureRandomBytes(32)
+	assert.NoError(t, err)
 
 	// Submit transactions for two different rollups
 	req1 := sequencing.SubmitRollupTransactionRequest{
@@ -119,7 +124,7 @@ func TestMultiRollupSequencer_MultipleRollups(t *testing.T) {
 		Tx:       tx2,
 	}
 
-	_, err := sequencer.SubmitRollupTransaction(context.Background(), req1)
+	_, err = sequencer.SubmitRollupTransaction(context.Background(), req1)
 	assert.NoError(t, err)
 
 	_, err = sequencer.SubmitRollupTransaction(context.Background(), req2)
