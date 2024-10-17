@@ -1,10 +1,10 @@
 package test
 
 import (
-	"bytes"
 	"context"
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
 
@@ -49,9 +49,7 @@ func (d *MultiRollupSequencer) GetNextBatch(ctx context.Context, req sequencing.
 	lastBatchHash := rollup.lastBatchHash
 	rollup.lastBatchHashMutex.RUnlock()
 
-	if (lastBatchHash == nil && req.LastBatchHash != nil) || (lastBatchHash != nil && req.LastBatchHash == nil) {
-		return nil, fmt.Errorf("nil mismatch: lastBatchHash = %v, req.LastBatchHash = %v", lastBatchHash, req.LastBatchHash)
-	} else if lastBatchHash != nil && !bytes.Equal(lastBatchHash, req.LastBatchHash) {
+	if !reflect.DeepEqual(lastBatchHash, req.LastBatchHash) {
 		return nil, fmt.Errorf("batch hash mismatch: lastBatchHash = %x, req.LastBatchHash = %x", lastBatchHash, req.LastBatchHash)
 	}
 
