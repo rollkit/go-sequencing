@@ -207,7 +207,7 @@ func TestDummySequencer_GetNextBatch_LastBatchHashMismatch(t *testing.T) {
 
 	// Assert that the batch hash mismatch error is returned
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "nil mismatch", "unexpected error message")
+	assert.ErrorContains(t, err, "batch hash mismatch", "unexpected error message")
 }
 
 // Test retrieving a batch with maxBytes limit
