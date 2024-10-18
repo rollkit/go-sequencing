@@ -1,3 +1,4 @@
+LDFLAGS=-ldflags="-X '$(versioningPath).buildTime=$(shell date)' -X '$(versioningPath).lastCommit=$(shell git rev-parse HEAD)' -X '$(versioningPath).semanticVersion=$(shell git describe --tags --dirty=-dev 2>/dev/null || git rev-parse --abbrev-ref HEAD)'"
 DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
@@ -6,6 +7,12 @@ DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bu
 pkgs := $(shell go list ./...)
 run := .
 count := 1
+
+## build: Build local-da binary.
+build:
+	@echo "--> Building local-sequencer"
+	@go build -o build/ ${LDFLAGS} ./...
+.PHONY: build
 
 ## help: Show this help message
 help: Makefile
@@ -40,6 +47,7 @@ lint: vet
 	@golangci-lint run
 	@echo "--> Running markdownlint"
 	@markdownlint --config .markdownlint.yaml '**/*.md'
+	@hadolint Dockerfile
 	@echo "--> Running yamllint"
 	@yamllint --no-warnings . -c .yamllint.yml
 
