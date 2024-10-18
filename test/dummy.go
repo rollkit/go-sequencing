@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math"
+	"reflect"
 	"sync"
 	"time"
 
@@ -105,18 +107,14 @@ func (d *DummySequencer) GetNextBatch(ctx context.Context, req sequencing.GetNex
 	lastBatchHash := d.lastBatchHash
 	d.lastBatchHashMutex.RUnlock()
 
-	if lastBatchHash == nil && req.LastBatchHash != nil {
-		return nil, errors.New("lastBatch is supposed to be nil")
-	} else if lastBatchHash != nil && req.LastBatchHash == nil {
-		return nil, errors.New("lastBatch is not supposed to be nil")
-	} else if !bytes.Equal(lastBatchHash, req.LastBatchHash) {
-		return nil, errors.New("supplied lastBatch does not match with sequencer last batch")
+	if !reflect.DeepEqual(lastBatchHash, req.LastBatchHash) {
+		return nil, fmt.Errorf("batch hash mismatch: lastBatchHash = %x, req.LastBatchHash = %x", lastBatchHash, req.LastBatchHash)
 	}
 
 	batch := d.tq.GetNextBatch(req.MaxBytes)
 	batchRes := &sequencing.GetNextBatchResponse{Batch: batch, Timestamp: now}
 	// If there are no transactions, return empty batch without updating the last batch hash
-	if batch.Transactions == nil {
+	if len(batch.Transactions) == 0 {
 		return batchRes, nil
 	}
 
