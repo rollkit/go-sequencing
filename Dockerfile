@@ -5,7 +5,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN go mod tidy -compat=1.19 && \
+RUN go mod tidy -compat=1.23 && \
     go build /src/cmd/local-sequencer/main.go
 
 # Final image
