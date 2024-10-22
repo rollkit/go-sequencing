@@ -16,6 +16,6 @@ WORKDIR /root
 # Copy over binaries from the build-env
 COPY --from=build-env /src/main /usr/bin/local-sequencer
 
-EXPOSE 7980
+EXPOSE 50051
 
 CMD ["local-sequencer", "-listen-all"]
