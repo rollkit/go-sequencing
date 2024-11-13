@@ -18,4 +18,5 @@ COPY --from=build-env /src/main /usr/bin/local-sequencer
 
 EXPOSE 50051
 
-CMD ["local-sequencer", "-listen-all"]
+ENTRYPOINT ["local-sequencer"]
+CMD ["-listen-all"]
