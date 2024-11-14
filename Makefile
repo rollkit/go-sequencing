@@ -8,11 +8,17 @@ pkgs := $(shell go list ./...)
 run := .
 count := 1
 
-## build: Build local-da binary.
+## build: Build local-sequencer binary.
 build:
 	@echo "--> Building local-sequencer"
 	@go build -o build/ ${LDFLAGS} ./...
 .PHONY: build
+
+## docker-build: Build local-sequencer docker image.
+docker-build:
+	@echo "--> Building local-sequencer docker image"
+	@docker build -t local-sequencer .
+.PHONY: docker-build
 
 ## help: Show this help message
 help: Makefile
