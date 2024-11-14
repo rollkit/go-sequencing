@@ -56,7 +56,9 @@ make lint
 
 ## Local Sequencer
 
-In this repo there is a mock `local-sequencer` server that implements the `go-sequencing` interface. This server is useful for testing and development purposes.
+In this repo there is a mock `local-sequencer` server that implements the
+`go-sequencing` interface. This server is useful for testing and development
+purposes.
 
 ### Running the local sequencer binary
 
@@ -72,7 +74,7 @@ This will build the `local-sequencer` binary. To run the server, run:
 ./build/local-sequencer
 ```
 
-You will see an output like the following: 
+You will see an output like the following:
   
 ```sh
 2024/11/13 10:56:01 Listening on: localhost:50051
@@ -92,7 +94,8 @@ This will build a `local-sequencer` Docker image. To run the server, run:
 docker run -p 50051:50051 --rm local-sequencer
 ```
 
-In order to connect your rollup to your local sequencer, you need to pass in the rollup ID by using the following command:
+In order to connect your rollup to your local sequencer, you need to pass in the
+rollup ID by using the following command:
 
 ```sh
 docker run -p 50051:50051 --rm local-sequencer -listen-all -rollup-id=testing
