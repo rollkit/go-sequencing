@@ -1,7 +1,6 @@
 module github.com/rollkit/go-sequencing
 
-go 1.21.0
-toolchain go1.22.9
+go 1.23.3
 
 require (
 	github.com/cosmos/gogoproto v1.7.0
