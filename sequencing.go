@@ -40,24 +40,15 @@ type BatchVerifier interface {
 	VerifyBatch(ctx context.Context, req VerifyBatchRequest) (*VerifyBatchResponse, error)
 }
 
-// RollupId is a unique identifier for a rollup chain
-type RollupId = []byte
-
-// Tx is a rollup transaction
-type Tx = []byte
-
-// Hash is a cryptographic hash of the Batch
-type Hash = []byte
-
 // Batch is a collection of transactions
 type Batch struct {
-	Transactions []Tx
+	Transactions [][]byte
 }
 
 // SubmitRollupTransactionRequest is a request to submit a transaction from rollup to sequencer
 type SubmitRollupTransactionRequest struct {
-	RollupId RollupId
-	Tx       Tx
+	RollupId []byte
+	Tx       []byte
 }
 
 // SubmitRollupTransactionResponse is a response to submitting a transaction from rollup to sequencer
@@ -66,8 +57,8 @@ type SubmitRollupTransactionResponse struct {
 
 // GetNextBatchRequest is a request to get the next batch of transactions from sequencer to rollup
 type GetNextBatchRequest struct {
-	RollupId      RollupId
-	LastBatchHash Hash
+	RollupId      []byte
+	LastBatchHash []byte
 	MaxBytes      uint64
 }
 
@@ -79,8 +70,8 @@ type GetNextBatchResponse struct {
 
 // VerifyBatchRequest is a request to verify a batch of transactions received from the sequencer
 type VerifyBatchRequest struct {
-	RollupId  RollupId
-	BatchHash Hash
+	RollupId  []byte
+	BatchHash []byte
 }
 
 // VerifyBatchResponse is a response to verifying a batch of transactions received from the sequencer

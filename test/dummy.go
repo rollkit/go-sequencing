@@ -19,19 +19,19 @@ var ErrInvalidRollupId = errors.New("invalid rollup id")
 
 // TransactionQueue is a queue of transactions
 type TransactionQueue struct {
-	queue []sequencing.Tx
+	queue [][]byte
 	mu    sync.Mutex
 }
 
 // NewTransactionQueue creates a new TransactionQueue
 func NewTransactionQueue() *TransactionQueue {
 	return &TransactionQueue{
-		queue: make([]sequencing.Tx, 0),
+		queue: make([][]byte, 0),
 	}
 }
 
 // AddTransaction adds a new transaction to the queue
-func (tq *TransactionQueue) AddTransaction(tx sequencing.Tx) {
+func (tq *TransactionQueue) AddTransaction(tx []byte) {
 	tq.mu.Lock()
 	defer tq.mu.Unlock()
 	tq.queue = append(tq.queue, tx)
