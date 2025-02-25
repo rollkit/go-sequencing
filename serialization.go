@@ -8,30 +8,12 @@ import (
 
 // ToProto serializes a batch to a protobuf message.
 func (batch *Batch) ToProto() *pbseq.Batch {
-	return &pbseq.Batch{Transactions: txsToByteSlices(batch.Transactions)}
+	return &pbseq.Batch{Transactions: batch.Transactions}
 }
 
 // FromProto deserializes a batch from a protobuf message.
 func (batch *Batch) FromProto(pb *pbseq.Batch) {
-	batch.Transactions = byteSlicesToTxs(pb.Transactions)
-}
-
-func txsToByteSlices(txs []Tx) [][]byte {
-	if txs == nil {
-		return nil
-	}
-	bytes := make([][]byte, len(txs))
-	copy(bytes, txs)
-	return bytes
-}
-
-func byteSlicesToTxs(bytes [][]byte) []Tx {
-	if len(bytes) == 0 {
-		return nil
-	}
-	txs := make([]Tx, len(bytes))
-	copy(txs, bytes)
-	return txs
+	batch.Transactions = pb.Transactions
 }
 
 // Marshal serializes a batch to a byte slice.
